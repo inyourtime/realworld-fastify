@@ -3,8 +3,11 @@ import cors from '@fastify/cors';
 import MongoConnect from './internal/mongo/connection';
 import UserModel from './entities/User.Entity';
 import UserService from './services/User.Service';
+import dotenv from 'dotenv';
 
 (async () => {
+  dotenv.config();
+
   const serverInstance = FastifyServer.getInstance();
   const f = serverInstance.getServer();
 
@@ -23,9 +26,9 @@ import UserService from './services/User.Service';
     // console.log(_id)
     // const user = await UserModel.findOne({ name: 'big' }).populate('followers').lean().exec();
     // await user?.populate('followers')
-    const userService = new UserService()
-    const users = await userService.findAll()
-    console.log(users)
+    const userService = new UserService();
+    const users = await userService.findAll();
+    console.log(users);
   } catch (e) {
     console.error('Error starting server:', e);
   }

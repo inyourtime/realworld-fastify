@@ -1,8 +1,13 @@
-import * as mongoose from 'mongoose';
+import mongoose from 'mongoose';
+import env from '../../utils/Env.Util';
 
-export default async function MongoConnect() {
-  await mongoose.connect(<string>process.env.MONGO_URL, {
-    dbName: process.env.MONGO_DB,
+export const ConnectMongo = async (): Promise<void> =>
+  new Promise((resolve, reject) => {
+    mongoose
+      .connect(env.MONGO_URL, { dbName: env.MONGO_DB })
+      .then(() => {
+        console.log('Mongodb has been initialize');
+        resolve();
+      })
+      .catch((e) => reject(e));
   });
-  console.log('Mongodb has been initialize');
-}

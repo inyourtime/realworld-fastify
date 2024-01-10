@@ -1,34 +1,12 @@
 import FastifyServer from './internal/fastify';
-import cors from '@fastify/cors';
-import MongoConnect from './internal/mongo/connection';
-import UserModel from './entities/User.Entity';
-import UserService from './services/User.Service';
-import dotenv from 'dotenv';
+import { ConnectMongo } from './internal/mongo/connection';
+import env from './utils/Env.Util';
 
 (async () => {
-  dotenv.config();
-
-  const serverInstance = FastifyServer.getInstance();
-  const f = serverInstance.getServer();
-
-  serverInstance.addPlugin(cors, {});
-
-  f.get('/', async (req, reply) => {
-    reply.send('hello');
-  });
+  const serverInstance = FastifyServer.getInstance().bootstrap();
 
   try {
-    await Promise.all([MongoConnect(), serverInstance.start()]);
-
-    // const user1 = await UserModel.create({ name: 'boat' });
-    // const user2 = await UserModel.create({ name: 'beam' });
-    // const user3 = await UserModel.create({ name: 'big', followers: [user1, user2] });
-    // console.log(_id)
-    // const user = await UserModel.findOne({ name: 'big' }).populate('followers').lean().exec();
-    // await user?.populate('followers')
-    const userService = new UserService();
-    const users = await userService.findAll();
-    console.log(users);
+    await Promise.all([ConnectMongo(), serverInstance.start(env.PORT)]);
   } catch (e) {
     console.error('Error starting server:', e);
   }

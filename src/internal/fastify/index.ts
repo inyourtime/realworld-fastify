@@ -1,4 +1,4 @@
-import fastify, {
+import Fastify, {
   FastifyInstance,
   FastifyPluginCallback,
   FastifyPluginOptions,
@@ -8,13 +8,14 @@ import path from 'path';
 import { glob } from 'glob';
 import cors from '@fastify/cors';
 import authenticate from '../../plugins/authenticate';
+import zodValidation from './validators/zod';
 
 export default class FastifyServer {
   private static instance: FastifyServer;
   private _server: FastifyInstance;
 
   private constructor() {
-    this._server = fastify();
+    this._server = Fastify();
   }
 
   public static getInstance(): FastifyServer {
@@ -32,7 +33,7 @@ export default class FastifyServer {
     return this;
   }
 
-  private addRouter(config?: IRouterConfig): FastifyServer {
+  private addRouter(config?: IRouterConfig | undefined): FastifyServer {
     const defaultArgs: IRouterConfig = {
       routerFolder: '../../routes/**/*.Route.@(js|ts)',
       prefix: 'api',
@@ -54,8 +55,17 @@ export default class FastifyServer {
     return this;
   }
 
+  private setValidatorCompiler() {
+    this._server.setValidatorCompiler(({ schema }) => {
+      const validation = zodValidation;
+      return validation.validate(schema);
+    });
+    return this;
+  }
+
   public bootstrap() {
-    this.addPlugin(cors)
+    this.setValidatorCompiler()
+      .addPlugin(cors)
       .addPlugin(authenticate)
       .addRouter({
         routerFolder: '../fastify/routes/**/*.Route.@(js|ts)',

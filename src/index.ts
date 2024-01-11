@@ -3,7 +3,7 @@ import { ConnectMongo } from './internal/mongo/connection';
 import env from './utils/env.util';
 
 (async () => {
-  const serverInstance = FastifyServer.getInstance().bootstrap();
+  const serverInstance = new FastifyServer().bootstrap();
 
   try {
     await Promise.all([ConnectMongo(), serverInstance.start(env.PORT)]);

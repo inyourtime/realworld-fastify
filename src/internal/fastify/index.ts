@@ -11,18 +11,10 @@ import authenticate from '../../plugins/authenticate';
 import zodValidation from './validators/zod';
 
 export default class FastifyServer {
-  private static instance: FastifyServer;
   private _server: FastifyInstance;
 
-  private constructor() {
+  constructor() {
     this._server = Fastify();
-  }
-
-  public static getInstance(): FastifyServer {
-    if (!FastifyServer.instance) {
-      FastifyServer.instance = new FastifyServer();
-    }
-    return FastifyServer.instance;
   }
 
   private addPlugin(
@@ -92,6 +84,7 @@ export default class FastifyServer {
   }
 
   public getServer(): FastifyInstance {
+    this.bootstrap();
     return this._server;
   }
 }

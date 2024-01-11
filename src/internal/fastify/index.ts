@@ -47,7 +47,7 @@ export default class FastifyServer {
     return this;
   }
 
-  private setValidatorCompiler() {
+  public setValidatorCompiler() {
     this._server.setValidatorCompiler(({ schema }) => {
       const validation = zodValidation;
       return validation.validate(schema);
@@ -83,8 +83,10 @@ export default class FastifyServer {
     return this._server.close();
   }
 
-  public getServer(): FastifyInstance {
-    this.bootstrap();
+  public getServer(lean: boolean = false): FastifyInstance {
+    if (!lean) {
+      this.bootstrap();
+    }
     return this._server;
   }
 }

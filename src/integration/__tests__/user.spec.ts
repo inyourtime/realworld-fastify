@@ -1,3 +1,4 @@
+import { STATES } from 'mongoose';
 import {
   cleanData,
   connect,
@@ -15,7 +16,10 @@ describe('test', () => {
       method: 'GET',
       url: '/service/hc',
     });
-    console.log(JSON.parse(res.payload));
-    expect(true).toBe(true);
+
+    const payload = JSON.parse(res.payload);
+    expect(res.statusCode).toBe(200);
+    expect(payload.message).toBe('OK');
+    expect(payload.mongoStatus).toBe(STATES[1]);
   });
 });

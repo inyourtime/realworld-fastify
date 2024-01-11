@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --coverage",
+    "test": "jest --config=jest.config.ts --detectOpenHandles --coverage",
     "dev": "nodemon src/index.ts",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.prod.json",
     "start": "node dist/index.js"
   },
   "keywords": [],

@@ -1,16 +1,17 @@
-import { error } from 'console';
-import FastifyServer from '../../internal/fastify';
+import FastifyServer from '..';
 
 describe('test fastify server', () => {
   it('test server start success', async () => {
-    let server: FastifyServer;
+    let server: FastifyServer | undefined;
     try {
       server = await new FastifyServer().bootstrap().start(3333);
     } catch (e) {
-      throw e;
+      console.log(e);
     }
     expect(server).toBeDefined();
-    server.stop();
+    if (server) {
+      server.stop();
+    }
   });
 
   it('test error server already listening', async () => {

@@ -1,6 +1,6 @@
 import FastifyServer from './internal/fastify';
 import { ConnectMongo } from './internal/mongo/connection';
-import env from './utils/Env.Util';
+import env from './utils/env.util';
 
 (async () => {
   const serverInstance = FastifyServer.getInstance().bootstrap();

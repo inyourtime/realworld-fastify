@@ -1,9 +1,14 @@
-import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import {
+  FastifyInstance,
+  FastifyPluginOptions,
+  FastifyReply,
+  FastifyRequest,
+} from 'fastify';
 import mongoose, { STATES } from 'mongoose';
 
 export default (
   server: FastifyInstance,
-  option: Record<string, any>,
+  option: FastifyPluginOptions,
   done: (err?: Error | undefined) => void,
 ) => {
   server.route({

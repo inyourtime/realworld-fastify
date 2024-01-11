@@ -3,7 +3,7 @@ import Fastify, {
   FastifyPluginCallback,
   FastifyPluginOptions,
 } from 'fastify';
-import { IRouterConfig } from './Server.Interface';
+import { IRouterConfig } from './server.interface';
 import path from 'path';
 import { glob } from 'glob';
 import cors from '@fastify/cors';
@@ -35,7 +35,7 @@ export default class FastifyServer {
 
   private addRouter(config?: IRouterConfig | undefined): FastifyServer {
     const defaultArgs: IRouterConfig = {
-      routerFolder: '../../routes/**/*.Route.@(js|ts)',
+      routerFolder: '../../routes/**/*.route.@(js|ts)',
       prefix: 'api',
     };
 
@@ -68,7 +68,7 @@ export default class FastifyServer {
       .addPlugin(cors)
       .addPlugin(authenticate)
       .addRouter({
-        routerFolder: '../fastify/routes/**/*.Route.@(js|ts)',
+        routerFolder: '../fastify/routes/**/*.route.@(js|ts)',
         prefix: 'service',
       })
       .addRouter();

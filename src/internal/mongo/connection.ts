@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import env from '../../utils/Env.Util';
+import env from '../../utils/env.util';
 
 export const ConnectMongo = async (): Promise<void> =>
   new Promise((resolve, reject) => {

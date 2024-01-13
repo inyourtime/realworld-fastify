@@ -1,6 +1,6 @@
 import z from 'zod';
 import FastifyServer from '..';
-import { indentityCheck } from '../validators/zod';
+import { identityCheck } from '../validators/zod';
 
 describe('Test zod validator', () => {
   it('Test validate pass with return status 200 OK', async () => {
@@ -65,7 +65,16 @@ describe('Test zod validator', () => {
       foo: z.string(),
       bar: z.number(),
     });
-    const isZod = indentityCheck(schema);
+    const isZod = identityCheck(schema);
     expect(isZod).toBe(true);
+  });
+
+  it('Test other object parse to zod indentityCheck', async () => {
+    const unk = {
+      foo: 'foo',
+      bar: 1,
+    };
+    const isZod = identityCheck(unk);
+    expect(isZod).toBe(false);
   });
 });

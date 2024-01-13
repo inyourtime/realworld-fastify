@@ -6,7 +6,7 @@ dotenv.config();
 const env = cleanEnv(process.env, {
   MONGO_URL: str(),
   MONGO_DB: str(),
-  PORT: num()
+  PORT: num(),
 });
 
 export default env;

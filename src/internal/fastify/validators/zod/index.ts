@@ -3,7 +3,7 @@ import { fromZodError } from 'zod-validation-error';
 
 export const name = 'Zod';
 
-export const indentityCheck = (schema: unknown) => {
+export const identityCheck = (schema: unknown) => {
   return schema instanceof z.ZodType;
 };
 
@@ -23,6 +23,6 @@ export const validate = (schema: unknown) => {
 
 export default {
   name,
-  indentityCheck,
+  identityCheck,
   validate,
 };

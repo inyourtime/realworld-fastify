@@ -5,125 +5,73 @@ import plugin, {
   ERR_TOKEN_INVALID,
 } from '../authenticate';
 import { generateAccessToken } from '../../utils/token';
+import { STATUS_CODE } from '../../internal/fastify/responseHandler/statusCode';
+
+const testCase = [
+  {
+    auth: false,
+    headerToken: '',
+    expectedCode: STATUS_CODE.OK,
+    expectedErrMessage: '',
+  },
+  {
+    auth: true,
+    headerToken: '',
+    expectedCode: ERR_MISSING_AUTHEN.statusCode,
+    expectedErrMessage: ERR_MISSING_AUTHEN.message,
+  },
+  {
+    auth: true,
+    headerToken: 'Auth asdf',
+    expectedCode: ERR_MISSING_AUTHEN.statusCode,
+    expectedErrMessage: ERR_MISSING_AUTHEN.message,
+  },
+  {
+    auth: true,
+    headerToken: 'Bearer asdf',
+    expectedCode: ERR_TOKEN_INVALID.statusCode,
+    expectedErrMessage: ERR_TOKEN_INVALID.message,
+  },
+  {
+    auth: true,
+    headerToken: `Bearer ${generateAccessToken({}, undefined, {
+      expiresIn: '1',
+    })}`,
+    expectedCode: ERR_TOKEN_EXPIRED.statusCode,
+    expectedErrMessage: ERR_TOKEN_EXPIRED.message,
+  },
+  {
+    auth: true,
+    headerToken: `Bearer ${generateAccessToken({}, undefined, {
+      expiresIn: '1d',
+    })}`,
+    expectedCode: STATUS_CODE.OK,
+    expectedErrMessage: '',
+  },
+];
 
 describe('Test authentication plugin', () => {
-  it('set config authen to false', async () => {
+  it.each(testCase)('test 1 2 3 4', async (c) => {
     const fastify = Fastify();
     fastify.register(plugin);
     fastify.route({
       method: 'GET',
-      url: '/test1',
+      url: '/test',
       config: {
-        auth: false,
-      },
-      handler: (req, res) => ({ message: 'done' }),
-    });
-
-    const res = await fastify.inject({ method: 'GET', url: '/test1' });
-    expect(res.statusCode).toBe(200);
-  });
-
-  it('no authen header', async () => {
-    const fastify = Fastify();
-    fastify.register(plugin);
-    fastify.route({
-      method: 'GET',
-      url: '/test2',
-      config: {
-        auth: true,
-      },
-      handler: (req, res) => ({ message: 'done' }),
-    });
-
-    const res = await fastify.inject({ method: 'GET', url: '/test2' });
-    expect(res.statusCode).toBe(ERR_MISSING_AUTHEN.statusCode);
-    expect(JSON.parse(res.body).message).toEqual(ERR_MISSING_AUTHEN.message);
-  });
-
-  it('authen header not Bearer', async () => {
-    const fastify = Fastify();
-    fastify.register(plugin);
-    fastify.route({
-      method: 'GET',
-      url: '/test3',
-      config: {
-        auth: true,
+        auth: c.auth,
       },
       handler: (req, res) => ({ message: 'done' }),
     });
 
     const res = await fastify.inject({
       method: 'GET',
-      url: '/test3',
-      headers: { authorization: 'Auth asdf' },
-    });
-    expect(res.statusCode).toBe(ERR_MISSING_AUTHEN.statusCode);
-    expect(JSON.parse(res.body).message).toEqual(ERR_MISSING_AUTHEN.message);
-  });
-
-  it('token invalid', async () => {
-    const fastify = Fastify();
-    fastify.register(plugin);
-    fastify.route({
-      method: 'GET',
-      url: '/test4',
-      config: {
-        auth: true,
-      },
-      handler: (req, res) => ({ message: 'done' }),
+      url: '/test',
+      headers: { authorization: c.headerToken },
     });
 
-    const res = await fastify.inject({
-      method: 'GET',
-      url: '/test4',
-      headers: { authorization: 'Bearer asdf' },
-    });
-    expect(res.statusCode).toBe(ERR_TOKEN_INVALID.statusCode);
-    expect(JSON.parse(res.body).message).toEqual(ERR_TOKEN_INVALID.message);
-  });
-
-  it('token expired', async () => {
-    const fastify = Fastify();
-    fastify.register(plugin);
-    fastify.route({
-      method: 'GET',
-      url: '/test5',
-      config: {
-        auth: true,
-      },
-      handler: (req, res) => ({ message: 'done' }),
-    });
-
-    const token = generateAccessToken({}, undefined, { expiresIn: '1' });
-
-    const res = await fastify.inject({
-      method: 'GET',
-      url: '/test5',
-      headers: { authorization: `Bearer ${token}` },
-    });
-    expect(res.statusCode).toBe(ERR_TOKEN_EXPIRED.statusCode);
-    expect(JSON.parse(res.body).message).toEqual(ERR_TOKEN_EXPIRED.message);
-  });
-
-  it('authen success', async () => {
-    const fastify = Fastify();
-    fastify.register(plugin);
-    fastify.route({
-      method: 'GET',
-      url: '/test6',
-      config: {
-        auth: true,
-      },
-      handler: (req, res) => ({ message: 'done' }),
-    });
-
-    const token = generateAccessToken({}, undefined, { expiresIn: '1d' });
-
-    const res = await fastify.inject({
-      method: 'GET',
-      url: '/test6',
-      headers: { authorization: `Bearer ${token}` },
-    });
-    expect(res.statusCode).toBe(200);
+    expect(res.statusCode).toBe(c.expectedCode);
+    if (c.expectedCode !== STATUS_CODE.OK) {
+      expect(JSON.parse(res.body).message).toEqual(c.expectedErrMessage);
+    }
   });
 });

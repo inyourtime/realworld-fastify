@@ -10,6 +10,6 @@ export default class UserService {
   }
 
   public findAll() {
-    return this._model.find().populate('followers').lean().exec()
+    return this._model.find().populate('followers').lean().exec();
   }
 }

@@ -9,6 +9,7 @@ import { glob } from 'glob';
 import cors from '@fastify/cors';
 import authenticate from '../../plugins/authenticate';
 import zodValidation from './validators/zod';
+import errorHandler from './error';
 
 export default class FastifyServer {
   private _server: FastifyInstance;
@@ -47,6 +48,11 @@ export default class FastifyServer {
     return this;
   }
 
+  private setErrorHandler() {
+    this._server.setErrorHandler(errorHandler);
+    return this;
+  }
+
   public setValidatorCompiler() {
     this._server.setValidatorCompiler(({ schema }) => {
       const validation = zodValidation;
@@ -57,6 +63,7 @@ export default class FastifyServer {
 
   public bootstrap() {
     this.setValidatorCompiler()
+      .setErrorHandler()
       .addPlugin(cors)
       .addPlugin(authenticate)
       .addRouter({

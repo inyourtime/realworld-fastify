@@ -1,3 +1,4 @@
+import { FastifyValidationResult } from 'fastify/types/schema';
 import z from 'zod';
 import { fromZodError } from 'zod-validation-error';
 
@@ -7,8 +8,8 @@ export const identityCheck = (schema: unknown) => {
   return schema instanceof z.ZodType;
 };
 
-export const validate = (schema: unknown) => {
-  return (data: unknown) => {
+export const validate = (schema: unknown): FastifyValidationResult => {
+  return (data: any) => {
     const zodParsedPayload = (<z.Schema>schema).safeParse(data);
 
     if (zodParsedPayload.success) return zodParsedPayload.data;

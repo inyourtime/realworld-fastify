@@ -6,7 +6,7 @@ export const ConnectMongo = async (): Promise<void> =>
     mongoose
       .connect(env.MONGO_URL, { dbName: env.MONGO_DB })
       .then(() => {
-        console.log('Mongodb has been initialize');
+        console.log('[Mongodb] has been initialized!');
         resolve();
       })
       .catch((e) => reject(e));

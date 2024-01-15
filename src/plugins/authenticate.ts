@@ -7,18 +7,17 @@ export interface AuthenticatePluginOptions {
 
 // The use of fastify-plugin is required to be able
 // to export the decorators to the outer scope
-export default fp<AuthenticatePluginOptions>((fastify, opts, done) => {
+export default fp<AuthenticatePluginOptions>(async (fastify, opts) => {
   // fastify.decorate('authen', function () {
   //   return 'authen'
   // })
   fastify.addHook(
     'onRequest',
     async (request: FastifyRequest, reply: FastifyReply) => {
-      // console.log(request.routeOptions.config.auth);
+      console.log(request.routeOptions.config.auth);
       // console.log('hello from hook');
     },
   );
-  done();
 });
 
 // When using .decorate you have to specify added properties for Typescript

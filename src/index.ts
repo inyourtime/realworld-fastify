@@ -6,7 +6,7 @@ import env from './utils/env.util';
   const serverInstance = new FastifyServer().bootstrap();
 
   try {
-    await Promise.all([ConnectMongo(), serverInstance.start(env.PORT)]);
+    await Promise.allSettled([ConnectMongo(), serverInstance.start(env.PORT)]);
   } catch (e) {
     console.error('Error starting server:', e);
   }

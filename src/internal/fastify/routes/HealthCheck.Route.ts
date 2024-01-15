@@ -6,10 +6,9 @@ import {
 } from 'fastify';
 import mongoose, { STATES } from 'mongoose';
 
-export default (
+export default async (
   server: FastifyInstance,
   option: FastifyPluginOptions,
-  done: (err?: Error | undefined) => void,
 ) => {
   server.route({
     method: 'GET',
@@ -25,6 +24,4 @@ export default (
       return healthcheck;
     },
   });
-
-  done();
 };

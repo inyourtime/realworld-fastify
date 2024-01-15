@@ -4,41 +4,79 @@ import {
   FastifyReply,
   FastifyPluginOptions,
 } from 'fastify';
-import z from 'zod';
+import {
+  TUserCreateSchema,
+  TUserLoginSchema,
+  TUserUpdateSchema,
+  userCreateSchema,
+  userLoginSchema,
+  userUpdateSchema,
+} from '../schemas/user.schema';
+import { checkPassword, hashPassword } from '../utils/bcrypt';
+import UserController from '../controllers/user.controller';
 
-enum Car {
-  BMW = 1,
-  BENZ = 2,
-}
-
-const foo = z.object({
-  email: z.string(),
-  password: z.string(),
-  carEnum: z.nativeEnum(Car),
-});
-
-export default (
+export default async (
   server: FastifyInstance,
   option: FastifyPluginOptions,
-  done: (err?: Error | undefined) => void,
 ) => {
-  server.get('/', async (req, reply) => {
-    reply.send('from route');
+  const apiModuleUsers = '/users';
+  const apiModuleUser = '/user';
+
+  server.route({
+    method: 'POST',
+    url: `${apiModuleUsers}/login`,
+    config: {
+      auth: false,
+    },
+    schema: {
+      body: userLoginSchema,
+    },
+    handler: async (
+      request: FastifyRequest<{ Body: TUserLoginSchema }>,
+      reply: FastifyReply,
+    ) => new UserController().login(request.body),
   });
 
   server.route({
     method: 'POST',
-    url: '/',
+    url: `${apiModuleUsers}`,
+    config: {
+      auth: false,
+    },
     schema: {
-      body: foo,
+      body: userCreateSchema,
     },
     handler: async (
-      request: FastifyRequest<{ Body: z.infer<typeof foo> }>,
+      request: FastifyRequest<{ Body: TUserCreateSchema }>,
       reply: FastifyReply,
-    ) => {
-      return request.body.carEnum === Car.BMW;
+    ) => new UserController().register(request.body),
+  });
+
+  server.route({
+    method: 'GET',
+    url: `${apiModuleUser}`,
+    config: {
+      auth: true,
+    },
+    handler: async (request: FastifyRequest, reply: FastifyReply) => {
+      // must inplement
     },
   });
 
-  done();
+  server.route({
+    method: 'PUT',
+    url: `${apiModuleUser}`,
+    config: {
+      auth: true,
+    },
+    schema: {
+      body: userUpdateSchema,
+    },
+    handler: async (
+      request: FastifyRequest<{ Body: TUserUpdateSchema }>,
+      reply: FastifyReply,
+    ) => {
+      // must inplement
+    },
+  });
 };

@@ -13,6 +13,9 @@ export default async (
   server.route({
     method: 'GET',
     url: '/hc',
+    config: {
+      auth: false
+    },
     handler: async (request: FastifyRequest, reply: FastifyReply) => {
       const healthcheck = {
         uptime: process.uptime(),

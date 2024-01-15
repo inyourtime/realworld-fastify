@@ -60,6 +60,8 @@ export default async (
     },
     handler: async (request: FastifyRequest, reply: FastifyReply) => {
       // must inplement
+      console.log(request.auth)
+      return true
     },
   });
 

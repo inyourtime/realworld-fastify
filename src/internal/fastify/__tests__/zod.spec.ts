@@ -1,16 +1,16 @@
 import z from 'zod';
 import FastifyServer from '..';
 import { identityCheck } from '../validators/zod';
-import { FastifySchema } from 'fastify';
+// import { FastifySchema } from 'fastify';
 
 describe('Test zod validator', () => {
 
-  interface TestCase {
-    name: string;
-    schema: FastifySchema;
-    method: string;
-    url: string;
-  }
+  // interface TestCase {
+  //   name: string;
+  //   schema: FastifySchema;
+  //   method: string;
+  //   url: string;
+  // }
   
   it('Test validate pass with return status 200 OK', async () => {
     // add validator

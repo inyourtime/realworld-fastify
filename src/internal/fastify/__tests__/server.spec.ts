@@ -19,9 +19,7 @@ describe('test fastify server', () => {
     const server = await new FastifyServer().bootstrap().start(3333);
     let e: Error | undefined;
 
-    const [err, server2] = await to(
-      new FastifyServer().bootstrap().start(3333),
-    );
+    const [err] = await to(new FastifyServer().bootstrap().start(3333));
     if (err) {
       e = err;
     }

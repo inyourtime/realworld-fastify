@@ -34,10 +34,10 @@ export class User extends TimeStamps {
   public image?: string;
 
   @prop({ ref: () => User })
-  public followers?: Ref<User>[];
+  public followers!: Ref<User>[];
 
   @prop({ ref: () => User })
-  public followings?: Ref<User>[];
+  public followings!: Ref<User>[];
 
   // @prop({ ref: () => Article })
   // public articlesLiked?: Ref<Article>[];
@@ -73,7 +73,7 @@ export class User extends TimeStamps {
     this: DocumentType<User>,
     id: T,
   ): boolean {
-    return (this.followings || []).includes(id);
+    return this.followings.includes(id);
   }
 }
 

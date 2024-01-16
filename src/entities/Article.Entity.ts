@@ -1,7 +1,6 @@
 import { ModelOptions, getModelForClass, prop } from '@typegoose/typegoose';
 import type { Ref } from '@typegoose/typegoose';
 import { TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
-import { randomUUID } from 'crypto';
 import { User } from './user.entity';
 import { Comment } from './comment.entity';
 

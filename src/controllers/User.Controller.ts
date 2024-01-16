@@ -6,10 +6,9 @@ import {
 } from '../schemas/user.schema';
 import { checkPassword, hashPassword } from '../utils/bcrypt';
 import { IUserResp } from '../declarations/interfaces/user.interface';
-import ApiError from '../internal/fastify/responseHandler/apiError';
-import { STATUS_CODE } from '../internal/fastify/responseHandler/statusCode';
 import BaseController from './base.controller';
 import { IAnyObject } from '../declarations/interfaces/base.interface';
+import errors from '../constants/errors';
 
 export default class UserController extends BaseController {
   constructor(auth?: IAnyObject) {
@@ -35,10 +34,7 @@ export default class UserController extends BaseController {
       };
     } catch (e: any) {
       if (e.code === 11000) {
-        throw ApiError.createError(
-          'Email or username are already exist',
-          STATUS_CODE.UNPROCESSABLE_CONTENT,
-        );
+        throw errors.USER_EXIST;
       }
       throw e;
     }
@@ -48,22 +44,17 @@ export default class UserController extends BaseController {
     email,
     password,
   }: TUserLoginSchema): Promise<{ user: IUserResp }> {
-    const loginError = ApiError.createError(
-      'Email or password are incorrect',
-      STATUS_CODE.UNAUTHORIZED,
-    );
-
     const user = await UserModel.findOne(
       { email },
       { email: 1, username: 1, bio: 1, image: 1, password: 1 },
     ).exec();
     if (!user) {
-      throw loginError;
+      throw errors.LOGIN_ERROR;
     }
 
     const match = await checkPassword(user.password, password);
     if (!match) {
-      throw loginError;
+      throw errors.LOGIN_ERROR;
     }
     return {
       user: user.toUserJSON(),
@@ -71,15 +62,11 @@ export default class UserController extends BaseController {
   }
 
   public async getCurrentUser(): Promise<{ user: IUserResp }> {
-    if (!this.auth) {
-      throw ApiError.createError(``, STATUS_CODE.FORBIDDEN);
-    }
-
     const user = await UserModel.findOne({
-      email: this.auth.user.email,
+      email: this.auth!.user.email,
     }).exec();
     if (!user) {
-      throw ApiError.createError(`User not found`, STATUS_CODE.NOT_FOUND);
+      throw errors.USER_NOTFOUND;
     }
 
     return {
@@ -99,7 +86,7 @@ export default class UserController extends BaseController {
       email: this.auth!.user.email,
     }).exec();
     if (!target) {
-      throw ApiError.createError(`User not found`, STATUS_CODE.NOT_FOUND);
+      throw errors.USER_NOTFOUND;
     }
 
     if (email) {
@@ -128,10 +115,7 @@ export default class UserController extends BaseController {
       };
     } catch (e: any) {
       if (e.code === 11000) {
-        throw ApiError.createError(
-          'Email or username are already exist',
-          STATUS_CODE.UNPROCESSABLE_CONTENT,
-        );
+        throw errors.USER_EXIST;
       }
       throw e;
     }

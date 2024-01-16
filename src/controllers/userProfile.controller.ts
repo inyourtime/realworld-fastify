@@ -18,7 +18,7 @@ export default class UserProfileController extends BaseController {
     }
 
     return this.auth
-      ? await UserModel.findOne({
+      ? UserModel.findOne({
           email: this.auth.user.email,
         })
           .exec()
@@ -36,24 +36,31 @@ export default class UserProfileController extends BaseController {
   public async followUser(
     username: string,
   ): Promise<{ profile: IUserProfileResp }> {
-    const loginUser = await UserModel.findOne({
-      email: this.auth!.user.email,
-    }).exec();
-    const targetUser = await UserModel.findOne({ username }).exec();
+    const [loginUser, targetUser] = await Promise.all([
+      UserModel.findOne({ email: this.auth!.user.email }).exec(),
+      UserModel.findOne({ username }).exec(),
+    ]);
 
     if (!loginUser || !targetUser) {
       throw errors.USER_NOTFOUND;
     }
 
-    if (!loginUser.followings?.includes(targetUser._id)) {
-      loginUser.followings?.push(targetUser);
-      targetUser.followers?.push(loginUser);
+    const canFollow =
+      !loginUser.followings.includes(targetUser._id) &&
+      loginUser.email !== targetUser.email;
+
+    if (canFollow) {
+      loginUser.followings.push(targetUser);
+      targetUser.followers.push(loginUser);
     }
 
-    const [, user] = await Promise.all([loginUser.save(), targetUser.save()]);
+    const [loginUserSaved, user] = await Promise.all([
+      loginUser.save(),
+      targetUser.save(),
+    ]);
 
     return {
-      profile: user.toProfileJSON(loginUser),
+      profile: user.toProfileJSON(loginUserSaved),
     };
   }
 }

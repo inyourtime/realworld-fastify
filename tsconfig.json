@@ -13,7 +13,7 @@
     "outDir": "dist",
     "rootDir": "src",
     "newLine": "lf",
-    // "noUnusedLocals": true,
+    "noUnusedLocals": true,
     "noFallthroughCasesInSwitch": true,
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,

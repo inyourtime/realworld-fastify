@@ -75,6 +75,13 @@ export class User extends TimeStamps {
   ): boolean {
     return this.followings.includes(id);
   }
+
+  public canFollow(
+    this: DocumentType<User>,
+    user: DocumentType<User>,
+  ): boolean {
+    return !this.followings.includes(user._id) && this.email !== user.email;
+  }
 }
 
 const UserModel = getModelForClass(User);

@@ -45,13 +45,9 @@ export default class UserProfileController extends BaseController {
       throw errors.USER_NOTFOUND;
     }
 
-    const canFollow =
-      !loginUser.followings.includes(targetUser._id) &&
-      loginUser.email !== targetUser.email;
-
-    if (canFollow) {
-      loginUser.followings.push(targetUser);
-      targetUser.followers.push(loginUser);
+    if (loginUser.canFollow(targetUser)) {
+      loginUser.followings.push(targetUser._id);
+      targetUser.followers.push(loginUser._id);
     }
 
     const [loginUserSaved, user] = await Promise.all([

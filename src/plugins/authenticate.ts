@@ -35,6 +35,9 @@ export default fp<AuthenticatePluginOptions>(async (fastify, opts) => {
 
       const authHeader = request.headers.authorization;
       if (!authHeader) {
+        if (routeOptions.auth === 'OPTIONAL') {
+          return;
+        }
         throw ERR_MISSING_AUTHEN;
       }
 
@@ -62,7 +65,7 @@ export default fp<AuthenticatePluginOptions>(async (fastify, opts) => {
 // When using .decorate you have to specify added properties for Typescript
 declare module 'fastify' {
   export interface FastifyContextConfig {
-    auth?: boolean | string;
+    auth?: boolean | 'OPTIONAL';
   }
 
   export interface FastifyRequest {

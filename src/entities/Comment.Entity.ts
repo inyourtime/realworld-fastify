@@ -10,8 +10,8 @@ import { User } from './user.entity';
   },
 })
 export class Comment extends TimeStamps {
-  @prop({ required: true, default: () => randomUUID() })
-  public _id!: string;
+  // @prop({ required: true, default: () => randomUUID() })
+  // public _id!: string;
 
   @prop()
   public body!: string;

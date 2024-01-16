@@ -155,4 +155,21 @@ describe('Test authentication plugin', () => {
       expect(res.statusCode).toBe(STATUS_CODE.NOT_FOUND);
     });
   });
+
+  it('Test authen is optinoal', async () => {
+    const fastify = Fastify();
+    fastify.register(plugin);
+    fastify.route({
+      method: 'GET',
+      url: '/test',
+      config: {
+        auth: 'OPTIONAL',
+      },
+      handler: (req, res) => ({ message: 'done' }),
+    });
+
+    const res = await fastify.inject({ method: 'GET', url: '/test' });
+
+    expect(res.statusCode).toBe(STATUS_CODE.OK);
+  });
 });

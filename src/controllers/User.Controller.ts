@@ -1,6 +1,9 @@
 import UserModel from '../entities/user.entity';
-import { TUserCreateSchema, TUserLoginSchema } from '../schemas/user.schema';
-import UserService from '../services/user.service';
+import {
+  TUserCreateSchema,
+  TUserLoginSchema,
+  TUserUpdateSchema,
+} from '../schemas/user.schema';
 import { checkPassword, hashPassword } from '../utils/bcrypt';
 import { IUserResp } from '../declarations/interfaces/user.interface';
 import ApiError from '../internal/fastify/responseHandler/apiError';
@@ -28,7 +31,7 @@ export default class UserController extends BaseController {
       });
 
       return {
-        user: user.toUserResponse(),
+        user: user.toUserJSON(),
       };
     } catch (e: any) {
       if (e.code === 11000) {
@@ -63,9 +66,74 @@ export default class UserController extends BaseController {
       throw loginError;
     }
     return {
-      user: user.toUserResponse(),
+      user: user.toUserJSON(),
     };
   }
 
-  public async getCurrentUser() {}
+  public async getCurrentUser(): Promise<{ user: IUserResp }> {
+    if (!this.auth) {
+      throw ApiError.createError(``, STATUS_CODE.FORBIDDEN);
+    }
+
+    const user = await UserModel.findOne({
+      email: this.auth.user.email,
+    }).exec();
+    if (!user) {
+      throw ApiError.createError(`User not found`, STATUS_CODE.NOT_FOUND);
+    }
+
+    return {
+      user: {
+        ...user.toUserJSON(),
+        token: undefined,
+      },
+    };
+  }
+
+  public async updateUser({
+    user,
+  }: TUserUpdateSchema): Promise<{ user: IUserResp }> {
+    const { email, username, password, image, bio } = user;
+
+    const target = await UserModel.findOne({
+      email: this.auth!.user.email,
+    }).exec();
+    if (!target) {
+      throw ApiError.createError(`User not found`, STATUS_CODE.NOT_FOUND);
+    }
+
+    if (email) {
+      target.email = email;
+    }
+    if (username) {
+      target.username = username;
+    }
+    if (password) {
+      target.password = await hashPassword(password);
+    }
+    if (image) {
+      target.image = image;
+    }
+    if (bio) {
+      target.bio = bio;
+    }
+
+    try {
+      const userUpdated = await target.save();
+      return {
+        user: {
+          ...userUpdated.toUserJSON(),
+          token: undefined,
+        },
+      };
+    } catch (e: any) {
+      if (e.code === 11000) {
+        throw ApiError.createError(
+          'Email or username are already exist',
+          STATUS_CODE.UNPROCESSABLE_CONTENT,
+        );
+      }
+      throw e;
+    }
+  }
 }

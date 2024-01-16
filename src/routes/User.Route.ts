@@ -33,7 +33,7 @@ export default async (
     handler: async (
       request: FastifyRequest<{ Body: TUserLoginSchema }>,
       reply: FastifyReply,
-    ) => new UserController().login(request.body),
+    ) => new UserController(request.auth).login(request.body),
   });
 
   server.route({
@@ -48,7 +48,7 @@ export default async (
     handler: async (
       request: FastifyRequest<{ Body: TUserCreateSchema }>,
       reply: FastifyReply,
-    ) => new UserController().register(request.body),
+    ) => new UserController(request.auth).register(request.body),
   });
 
   server.route({
@@ -57,11 +57,8 @@ export default async (
     config: {
       auth: true,
     },
-    handler: async (request: FastifyRequest, reply: FastifyReply) => {
-      // must inplement
-      console.log(request.auth);
-      return true;
-    },
+    handler: async (request: FastifyRequest, reply: FastifyReply) =>
+      new UserController(request.auth).getCurrentUser(),
   });
 
   server.route({
@@ -76,8 +73,6 @@ export default async (
     handler: async (
       request: FastifyRequest<{ Body: TUserUpdateSchema }>,
       reply: FastifyReply,
-    ) => {
-      // must inplement
-    },
+    ) => new UserController(request.auth).updateUser(request.body),
   });
 };

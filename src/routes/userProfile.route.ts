@@ -4,6 +4,7 @@ import {
   FastifyReply,
   FastifyRequest,
 } from 'fastify';
+import UserProfileController from '../controllers/userProfile.controller';
 
 export default async (
   server: FastifyInstance,
@@ -15,14 +16,15 @@ export default async (
     method: 'GET',
     url: `${apiModule}/:username`,
     config: {
-      auth: false,
+      auth: 'OPTIONAL',
     },
     handler: async (
       request: FastifyRequest<{ Params: { username: string } }>,
       reply: FastifyReply,
-    ) => {
-      // must inplement
-    },
+    ) =>
+      new UserProfileController(request.auth).getProfile(
+        request.params.username,
+      ),
   });
 
   server.route({
@@ -34,9 +36,10 @@ export default async (
     handler: async (
       request: FastifyRequest<{ Params: { username: string } }>,
       reply: FastifyReply,
-    ) => {
-      // must inplement
-    },
+    ) =>
+      new UserProfileController(request.auth).followUser(
+        request.params.username,
+      ),
   });
 
   server.route({

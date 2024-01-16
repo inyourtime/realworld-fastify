@@ -11,8 +11,8 @@ import { Comment } from './comment.entity';
   },
 })
 export class Article extends TimeStamps {
-  @prop({ required: true, default: () => randomUUID() })
-  public _id!: string;
+  // @prop({ required: true, default: () => randomUUID() })
+  // public _id!: string;
 
   @prop({ unique: true, required: true })
   public slug!: string;

@@ -5,12 +5,12 @@ import { checkPassword, hashPassword } from '../utils/bcrypt';
 import { IUserResp } from '../declarations/interfaces/user.interface';
 import ApiError from '../internal/fastify/responseHandler/apiError';
 import { STATUS_CODE } from '../internal/fastify/responseHandler/statusCode';
+import BaseController from './base.controller';
+import { IAnyObject } from '../declarations/interfaces/base.interface';
 
-export default class UserController {
-  private userService: UserService;
-
-  constructor() {
-    this.userService = new UserService();
+export default class UserController extends BaseController {
+  constructor(auth?: IAnyObject) {
+    super(auth);
   }
 
   public async register({

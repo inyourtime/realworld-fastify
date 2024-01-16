@@ -12,7 +12,6 @@ import {
   userLoginSchema,
   userUpdateSchema,
 } from '../schemas/user.schema';
-import { checkPassword, hashPassword } from '../utils/bcrypt';
 import UserController from '../controllers/user.controller';
 
 export default async (
@@ -60,8 +59,8 @@ export default async (
     },
     handler: async (request: FastifyRequest, reply: FastifyReply) => {
       // must inplement
-      console.log(request.auth)
-      return true
+      console.log(request.auth);
+      return true;
     },
   });
 

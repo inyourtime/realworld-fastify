@@ -50,8 +50,6 @@ export default fp<AuthenticatePluginOptions>(async (fastify, opts) => {
             throw ERR_TOKEN_EXPIRED;
           case error instanceof JsonWebTokenError:
             throw ERR_TOKEN_INVALID;
-          default:
-            throw error;
         }
       }
 

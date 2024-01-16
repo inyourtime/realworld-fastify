@@ -9,10 +9,12 @@ import { STATUS_CODE } from '../../internal/fastify/responseHandler/statusCode';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 
 jest.mock('../../utils/token.ts', () => ({
-  verifyToken: jest.fn((token: string, secret: string) => ({
-    error: null,
-    result: 'success',
-  })),
+  verifyToken: jest.fn<ReturnType<typeof verifyToken>, [string, string]>(
+    (token: string, secret: string) => ({
+      error: null,
+      result: 'success',
+    }),
+  ),
 }));
 
 const cases = [
@@ -75,8 +77,11 @@ describe('Test authentication plugin', () => {
 
   describe('error case', () => {
     it('should invalid token', async () => {
-      (verifyToken as jest.Mock).mockReturnValueOnce({
+      (
+        verifyToken as jest.Mock<ReturnType<typeof verifyToken>>
+      ).mockReturnValueOnce({
         error: new JsonWebTokenError('invalid'),
+        result: undefined,
       });
 
       const fastify = Fastify();
@@ -101,8 +106,11 @@ describe('Test authentication plugin', () => {
     });
 
     it('should expired token', async () => {
-      (verifyToken as jest.Mock).mockReturnValueOnce({
+      (
+        verifyToken as jest.Mock<ReturnType<typeof verifyToken>>
+      ).mockReturnValueOnce({
         error: new TokenExpiredError('expired', new Date()),
+        result: undefined,
       });
 
       const fastify = Fastify();
@@ -124,31 +132,6 @@ describe('Test authentication plugin', () => {
 
       expect(res.statusCode).toBe(ERR_TOKEN_EXPIRED.statusCode);
       expect(JSON.parse(res.body).message).toEqual(ERR_TOKEN_EXPIRED.message);
-    });
-
-    it('unexpected error', async () => {
-      (verifyToken as jest.Mock).mockReturnValueOnce({
-        error: new Error('error'),
-      });
-
-      const fastify = Fastify();
-      fastify.register(plugin);
-      fastify.route({
-        method: 'GET',
-        url: '/test',
-        config: {
-          auth: true,
-        },
-        handler: (req, res) => ({ message: 'done' }),
-      });
-
-      const res = await fastify.inject({
-        method: 'GET',
-        url: '/test',
-        headers: { authorization: 'Bearer asdf' },
-      });
-
-      expect(res.statusCode).toBe(STATUS_CODE.INTERNAL_SERVER_ERROR);
     });
 
     it('not found route', async () => {

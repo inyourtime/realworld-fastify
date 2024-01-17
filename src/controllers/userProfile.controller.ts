@@ -20,7 +20,7 @@ export default class UserProfileController extends BaseController {
 
     return this.auth
       ? UserModel.findOne({
-          email: this.auth.user.email,
+          email: this.getUserEmail(),
         })
           .exec()
           .then((loginUser) => {
@@ -38,7 +38,7 @@ export default class UserProfileController extends BaseController {
     username: string,
   ): Promise<{ profile: IUserProfileResp }> {
     const [loginUser, targetUser] = await Promise.all([
-      UserModel.findOne({ email: this.auth!.user.email }).exec(),
+      UserModel.findOne({ email: this.getUserEmail() }).exec(),
       UserModel.findOne({ username }).exec(),
     ]);
 
@@ -65,7 +65,7 @@ export default class UserProfileController extends BaseController {
     username: string,
   ): Promise<{ profile: IUserProfileResp }> {
     const [loginUser, targetUser] = await Promise.all([
-      UserModel.findOne({ email: this.auth!.user.email }).exec(),
+      UserModel.findOne({ email: this.getUserEmail() }).exec(),
       UserModel.findOne({ username }).exec(),
     ]);
 

@@ -15,9 +15,6 @@ import { Types } from 'mongoose';
   },
 })
 export class User extends TimeStamps {
-  // @prop({ required: true, default: () => randomUUID() })
-  // public _id!: string;
-
   @prop({ unique: true, required: true })
   public email!: string;
 
@@ -38,9 +35,6 @@ export class User extends TimeStamps {
 
   @prop({ ref: () => User })
   public followings!: Ref<User>[];
-
-  // @prop({ ref: () => Article })
-  // public articlesLiked?: Ref<Article>[];
 
   public toUserJSON(this: DocumentType<User>): IUserResp {
     return {

@@ -63,7 +63,7 @@ export default class UserController extends BaseController {
 
   public async getCurrentUser(): Promise<{ user: IUserResp }> {
     const user = await UserModel.findOne({
-      email: this.auth!.user.email,
+      email: this.getUserEmail(),
     }).exec();
     if (!user) {
       throw errors.USER_NOTFOUND;
@@ -83,7 +83,7 @@ export default class UserController extends BaseController {
     const { email, username, password, image, bio } = user;
 
     const target = await UserModel.findOne({
-      email: this.auth!.user.email,
+      email: this.getUserEmail(),
     }).exec();
     if (!target) {
       throw errors.USER_NOTFOUND;

@@ -6,4 +6,12 @@ export default abstract class BaseController {
   constructor(auth?: IAnyObject) {
     this.auth = auth;
   }
+
+  protected getUserId(): string {
+    return this.auth!.user.id;
+  }
+
+  protected getUserEmail(): string {
+    return this.auth!.user.email;
+  }
 }

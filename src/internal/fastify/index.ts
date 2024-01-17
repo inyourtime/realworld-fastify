@@ -48,7 +48,7 @@ export default class FastifyServer {
     return this;
   }
 
-  private setErrorHandler() {
+  public setErrorHandler() {
     this._server.setErrorHandler(errorHandler);
     return this;
   }

@@ -8,6 +8,7 @@ import {
 } from '../declarations/interfaces/user.interface';
 import { generateAccessToken } from '../utils/token';
 import { Types } from 'mongoose';
+import { Article } from './article.entity';
 
 @ModelOptions({
   schemaOptions: {
@@ -35,6 +36,13 @@ export class User extends TimeStamps {
 
   @prop({ ref: () => User })
   public followings!: Ref<User>[];
+
+  @prop({
+    ref: 'Article',
+    localField: '_id',
+    foreignField: 'favouritedUsers',
+  })
+  favouritedArticles?: Ref<Article>[];
 
   public toUserJSON(this: DocumentType<User>): IUserResp {
     return {
@@ -81,7 +89,7 @@ export class User extends TimeStamps {
     this: DocumentType<User>,
     user: DocumentType<User>,
   ): boolean {
-    return !this.canFollow(user);
+    return this.followings.includes(user._id) && this.email !== user.email;
   }
 }
 

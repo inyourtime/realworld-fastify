@@ -30,7 +30,7 @@ export default async (
     handler: async (
       request: FastifyRequest<{ Querystring: TArticlesListQuery }>,
       reply: FastifyReply,
-    ) => new ArticleController(request.auth).listArticles(),
+    ) => new ArticleController(request.auth).listArticles(request.query),
   });
 
   server.route({
@@ -52,7 +52,7 @@ export default async (
     handler: async (
       request: FastifyRequest<{ Params: { slug: string } }>,
       reply: FastifyReply,
-    ) => new ArticleController(request.auth).getArticle(),
+    ) => new ArticleController(request.auth).getArticle(request.params.slug),
   });
 
   server.route({

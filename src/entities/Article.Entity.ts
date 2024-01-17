@@ -13,6 +13,7 @@ import slugify from 'slugify';
 import { IArticleResp } from '../declarations/interfaces/article.interface';
 import errors from '../constants/errors';
 import { IUserProfileResp } from '../declarations/interfaces/user.interface';
+import { Types } from 'mongoose';
 
 @ModelOptions({
   schemaOptions: {
@@ -39,7 +40,7 @@ export class Article extends TimeStamps {
   public tagList?: string[];
 
   @prop({ ref: () => User })
-  public favouritedUsers?: Ref<User>[];
+  public favouritedUsers!: Ref<User>[];
 
   @prop({ ref: () => User })
   public author!: Ref<User>;
@@ -49,7 +50,7 @@ export class Article extends TimeStamps {
 
   public async toArticleJSON(
     this: DocumentType<Article>,
-    user: DocumentType<User>,
+    user?: DocumentType<User>,
   ): Promise<IArticleResp> {
     return {
       slug: this.slug,
@@ -59,15 +60,15 @@ export class Article extends TimeStamps {
       tagList: this.tagList,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
-      favorited: false,
-      favoritesCount: 0,
+      favorited: user ? this.isFavourite(user._id) : false,
+      favoritesCount: this.favouritedUsers.length,
       author: await this.getAuthorObject(user),
     };
   }
 
   public async getAuthorObject(
     this: DocumentType<Article>,
-    user: DocumentType<User>,
+    user?: DocumentType<User>,
   ): Promise<IUserProfileResp> {
     return isDocument(this.author)
       ? this.author.toProfileJSON(user)
@@ -77,6 +78,13 @@ export class Article extends TimeStamps {
             if (!author) throw errors.USER_NOTFOUND;
             return author.toProfileJSON(user);
           });
+  }
+
+  public isFavourite<T extends Types.ObjectId>(
+    this: DocumentType<Article>,
+    id: T,
+  ): boolean {
+    return this.favouritedUsers.includes(id);
   }
 }
 

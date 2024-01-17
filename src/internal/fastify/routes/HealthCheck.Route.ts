@@ -14,7 +14,7 @@ export default async (
     method: 'GET',
     url: '/hc',
     config: {
-      auth: false
+      auth: false,
     },
     handler: async (request: FastifyRequest, reply: FastifyReply) => {
       const healthcheck = {

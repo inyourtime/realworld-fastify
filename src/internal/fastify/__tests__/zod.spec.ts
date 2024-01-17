@@ -4,14 +4,13 @@ import { identityCheck } from '../validators/zod';
 // import { FastifySchema } from 'fastify';
 
 describe('Test zod validator', () => {
-
   // interface TestCase {
   //   name: string;
   //   schema: FastifySchema;
   //   method: string;
   //   url: string;
   // }
-  
+
   it('Test validate pass with return status 200 OK', async () => {
     // add validator
     const server = new FastifyServer().setValidatorCompiler().getServer(true);
@@ -36,10 +35,7 @@ describe('Test zod validator', () => {
       method: 'POST',
       url: '/',
       payload,
-      query: {
-        
-      },
-      
+      query: {},
     });
 
     expect(res.statusCode).toBe(200);

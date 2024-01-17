@@ -7,6 +7,7 @@ import env from './utils/env.util';
 
   try {
     await Promise.allSettled([ConnectMongo(), serverInstance.start(env.PORT)]);
+    console.log('[Server] has been initialized!');
   } catch (e) {
     console.error('Error starting server:', e);
   }

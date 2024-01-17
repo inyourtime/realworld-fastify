@@ -78,10 +78,7 @@ export default class FastifyServer {
     return new Promise((resolve, reject) => {
       this._server
         .listen({ port })
-        .then(() => {
-          console.log('[Server] has been initialized!');
-          this._server.ready().then(() => resolve(this));
-        })
+        .then(() => resolve(this))
         .catch((e) => reject(e));
     });
   }

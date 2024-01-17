@@ -1,4 +1,4 @@
-import type { JestConfigWithTsJest } from 'ts-jest'
+import type { JestConfigWithTsJest } from 'ts-jest';
 
 const jestConfig: JestConfigWithTsJest = {
   // [...]
@@ -12,6 +12,6 @@ const jestConfig: JestConfigWithTsJest = {
   // forceExit: true,
   // setupFilesAfterEnv: ["<rootDir>/src/__tests__/helpers/setup.ts"]
   // setupFiles: ["./src/cores/configs/configs.ts"]
-}
+};
 
-export default jestConfig
+export default jestConfig;

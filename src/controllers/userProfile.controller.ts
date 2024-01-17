@@ -3,6 +3,7 @@ import { IAnyObject } from '../declarations/interfaces/base.interface';
 import { IUserProfileResp } from '../declarations/interfaces/user.interface';
 import UserModel from '../entities/user.entity';
 import BaseController from './base.controller';
+import { runTransaction } from '../internal/mongo/connection';
 
 export default class UserProfileController extends BaseController {
   constructor(auth?: IAnyObject) {
@@ -50,13 +51,13 @@ export default class UserProfileController extends BaseController {
       targetUser.followers.push(loginUser._id);
     }
 
-    const [loginUserSaved, user] = await Promise.all([
-      loginUser.save(),
-      targetUser.save(),
-    ]);
+    return runTransaction(async (session) => {
+      await loginUser.save({ session });
+      await targetUser.save({ session });
 
-    return {
-      profile: user.toProfileJSON(loginUserSaved),
-    };
+      return {
+        profile: targetUser.toProfileJSON(loginUser),
+      };
+    });
   }
 }

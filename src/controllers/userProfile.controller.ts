@@ -49,15 +49,46 @@ export default class UserProfileController extends BaseController {
     if (loginUser.canFollow(targetUser)) {
       loginUser.followings.push(targetUser._id);
       targetUser.followers.push(loginUser._id);
+
+      await runTransaction(async (session) => {
+        await loginUser.save({ session });
+        await targetUser.save({ session });
+      });
     }
 
-    return runTransaction(async (session) => {
-      await loginUser.save({ session });
-      await targetUser.save({ session });
+    return {
+      profile: targetUser.toProfileJSON(loginUser),
+    };
+  }
 
-      return {
-        profile: targetUser.toProfileJSON(loginUser),
-      };
-    });
+  public async unFollowUser(
+    username: string,
+  ): Promise<{ profile: IUserProfileResp }> {
+    const [loginUser, targetUser] = await Promise.all([
+      UserModel.findOne({ email: this.auth!.user.email }).exec(),
+      UserModel.findOne({ username }).exec(),
+    ]);
+
+    if (!loginUser || !targetUser) {
+      throw errors.USER_NOTFOUND;
+    }
+
+    if (loginUser.canUnFollow(targetUser)) {
+      loginUser.followings = loginUser.followings.filter(
+        (followingId) => followingId.toString() !== targetUser._id.toString(),
+      );
+      targetUser.followers = targetUser.followers.filter(
+        (followerId) => followerId.toString() !== loginUser._id.toString(),
+      );
+
+      await runTransaction(async (session) => {
+        await loginUser.save({ session });
+        await targetUser.save({ session });
+      });
+    }
+
+    return {
+      profile: targetUser.toProfileJSON(loginUser),
+    };
   }
 }

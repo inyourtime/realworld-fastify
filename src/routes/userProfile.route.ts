@@ -51,8 +51,9 @@ export default async (
     handler: async (
       request: FastifyRequest<{ Params: { username: string } }>,
       reply: FastifyReply,
-    ) => {
-      // must inplement
-    },
+    ) =>
+      new UserProfileController(request.auth).unFollowUser(
+        request.params.username,
+      ),
   });
 };

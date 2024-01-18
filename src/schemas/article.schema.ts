@@ -37,6 +37,7 @@ export const articleUpdateSchema = z.object({
     title: z.string().optional(),
     description: z.string().optional(),
     body: z.string().optional(),
+    tagList: z.string().min(1).array().nonempty().optional(),
   }),
 });
 

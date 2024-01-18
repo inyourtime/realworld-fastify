@@ -2,10 +2,13 @@ import errors from '../constants/errors';
 import { IArticleResp } from '../declarations/interfaces/article.interface';
 import { IAnyObject } from '../declarations/interfaces/base.interface';
 import { ArticleModel, UserModel } from '../entities';
+import ApiError from '../internal/fastify/responseHandler/apiError';
+import { STATUS_CODE } from '../internal/fastify/responseHandler/statusCode';
 import { runTransaction } from '../internal/mongo/connection';
 
 import {
   TArticleCreateSchema,
+  TArticleUpdateSchema,
   TArticlesListQuery,
 } from '../schemas/article.schema';
 import BaseController from './base.controller';
@@ -60,9 +63,65 @@ export default class ArticleController extends BaseController {
     }
   }
 
-  public async updateArticle() {}
+  public async updateArticle(
+    slug: string,
+    { article }: TArticleUpdateSchema,
+  ): Promise<{ article: IArticleResp }> {
+    const { title, description, body, tagList } = article;
 
-  public async deleteArticle() {}
+    const loginUser = await UserModel.findById(this.getUserId()).exec();
+    if (!loginUser) throw errors.USER_NOTFOUND;
+
+    const target = await ArticleModel.findOne({ slug }).exec();
+    if (!target) throw errors.ARTICLE_NOTFOUND;
+
+    if (target.author.toString() !== loginUser._id.toString()) {
+      throw ApiError.createError('You cannot do this', STATUS_CODE.FORBIDDEN);
+    }
+
+    if (title) {
+      target.title = title;
+    }
+    if (description) {
+      target.description = description;
+    }
+    if (body) {
+      target.body = body;
+    }
+    if (tagList) {
+      target.tagList = tagList;
+    }
+
+    try {
+      await target.save();
+      return {
+        article: await target.toArticleJSON(loginUser),
+      };
+    } catch (e: any) {
+      if (e.code === 11000) {
+        throw errors.ARTICLE_EXIST;
+      }
+      throw e;
+    }
+  }
+
+  public async deleteArticle(slug: string) {
+    const loginUser = await UserModel.findById(this.getUserId()).exec();
+    if (!loginUser) throw errors.USER_NOTFOUND;
+
+    const target = await ArticleModel.findOne({ slug }).exec();
+    if (!target) throw errors.ARTICLE_NOTFOUND;
+
+    if (target.author.toString() !== loginUser._id.toString()) {
+      throw ApiError.createError('You cannot do this', STATUS_CODE.FORBIDDEN);
+    }
+
+    await ArticleModel.deleteOne({ slug });
+
+    return {
+      message: 'Article successfully deleted!!!',
+    };
+  }
 
   public async favoriteArticle(
     slug: string,

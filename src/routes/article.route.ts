@@ -9,9 +9,11 @@ import {
   TArticleCreateSchema,
   TArticleUpdateSchema,
   TArticlesListQuery,
+  TBaseArticleQuery,
   articleCreateSchema,
   articleListQuery,
   articleUpdateSchema,
+  baseArticleQuery,
 } from '../schemas/article.schema';
 
 export default async (
@@ -41,8 +43,13 @@ export default async (
     config: {
       auth: true,
     },
-    handler: async (request: FastifyRequest, reply: FastifyReply) =>
-      new ArticleController(request.auth).feedArticles(),
+    schema: {
+      querystring: baseArticleQuery,
+    },
+    handler: async (
+      request: FastifyRequest<{ Querystring: TBaseArticleQuery }>,
+      reply: FastifyReply,
+    ) => new ArticleController(request.auth).feedArticles(request.query),
   });
 
   server.route({

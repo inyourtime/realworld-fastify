@@ -1,5 +1,8 @@
 import errors from '../constants/errors';
-import { IArticleResp } from '../declarations/interfaces/article.interface';
+import {
+  IArticleQuery,
+  IArticleResp,
+} from '../declarations/interfaces/article.interface';
 import { IAnyObject } from '../declarations/interfaces/base.interface';
 import { ArticleModel, UserModel } from '../entities';
 import ApiError from '../internal/fastify/responseHandler/apiError';
@@ -10,6 +13,7 @@ import {
   TArticleCreateSchema,
   TArticleUpdateSchema,
   TArticlesListQuery,
+  TBaseArticleQuery,
 } from '../schemas/article.schema';
 import BaseController from './base.controller';
 
@@ -18,18 +22,98 @@ export default class ArticleController extends BaseController {
     super(auth);
   }
 
-  public async listArticles(query: TArticlesListQuery) {
-    const { limit, offset, tag, author, favorited } = query;
+  public async listArticles({
+    limit,
+    offset,
+    tag,
+    author,
+    favorited,
+  }: TArticlesListQuery): Promise<{
+    articles: IArticleResp[];
+    articlesCount: number;
+  }> {
+    let query: IArticleQuery = {};
+    if (tag) {
+      query.tagList = { $in: [tag] };
+    }
 
-    tag;
-    author;
-    favorited;
-    const article = await ArticleModel.find({}, {}, { limit, skip: offset });
+    if (author) {
+      const selectedAuthor = await UserModel.findOne({
+        username: author,
+      }).exec();
+      if (selectedAuthor) {
+        query.author = selectedAuthor._id;
+      }
+    }
 
-    return article;
+    if (favorited) {
+      const favoriter = await UserModel.findOne({ username: favorited }).exec();
+      if (favoriter) {
+        query._id = { $in: favoriter.favouritedArticles };
+      }
+    }
+
+    const filteredArticles = await ArticleModel.find(query)
+      .limit(limit)
+      .skip(offset)
+      .sort({ createdAt: 'desc' })
+      .populate('author')
+      .exec();
+
+    const articlesCount = await ArticleModel.countDocuments(query);
+
+    return this.auth
+      ? UserModel.findById(this.getUserId())
+          .exec()
+          .then(async (loginUser) => {
+            if (!loginUser) throw errors.USER_NOTFOUND;
+            return {
+              articles: await Promise.all(
+                filteredArticles.map(async (article) =>
+                  article.toArticleJSON(loginUser),
+                ),
+              ),
+              articlesCount,
+            };
+          })
+      : {
+          articles: await Promise.all(
+            filteredArticles.map(async (article) => article.toArticleJSON()),
+          ),
+          articlesCount,
+        };
   }
 
-  public async feedArticles() {}
+  public async feedArticles({ limit, offset }: TBaseArticleQuery): Promise<{
+    articles: IArticleResp[];
+    articlesCount: number;
+  }> {
+    const loginUser = await UserModel.findById(this.getUserId()).exec();
+    if (!loginUser) throw errors.USER_NOTFOUND;
+
+    const query: IAnyObject = {
+      author: {
+        $in: loginUser.followings,
+      },
+    };
+
+    const filteredArticles = await ArticleModel.find(query)
+      .limit(limit)
+      .skip(offset)
+      .populate('author')
+      .exec();
+
+    const articlesCount = await ArticleModel.countDocuments(query);
+
+    return {
+      articles: await Promise.all(
+        filteredArticles.map(async (article) =>
+          article.toArticleJSON(loginUser),
+        ),
+      ),
+      articlesCount,
+    };
+  }
 
   public async getArticle(slug: string): Promise<{ article: IArticleResp }> {
     const article = await ArticleModel.findOne({ slug }, undefined, {

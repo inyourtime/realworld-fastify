@@ -103,7 +103,7 @@ export default async (
     handler: async (
       request: FastifyRequest<{ Params: { slug: string } }>,
       reply: FastifyReply,
-    ) => new ArticleController(request.auth).favoriteArticle(),
+    ) => new ArticleController(request.auth).favoriteArticle(request.params.slug),
   });
 
   server.route({
@@ -115,6 +115,6 @@ export default async (
     handler: async (
       request: FastifyRequest<{ Params: { slug: string } }>,
       reply: FastifyReply,
-    ) => new ArticleController(request.auth).unFavoriteArticle(),
+    ) => new ArticleController(request.auth).unFavoriteArticle(request.params.slug),
   });
 };

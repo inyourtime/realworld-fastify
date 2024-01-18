@@ -1,9 +1,10 @@
 import errors from '../constants/errors';
 import { IAnyObject } from '../declarations/interfaces/base.interface';
 import { IUserProfileResp } from '../declarations/interfaces/user.interface';
-import UserModel from '../entities/user.entity';
+
 import BaseController from './base.controller';
 import { runTransaction } from '../internal/mongo/connection';
+import { UserModel } from '../entities';
 
 export default class UserProfileController extends BaseController {
   constructor(auth?: IAnyObject) {
@@ -46,7 +47,7 @@ export default class UserProfileController extends BaseController {
       throw errors.USER_NOTFOUND;
     }
 
-    if (loginUser.canFollow(targetUser)) {
+    if (!loginUser.isFollowing(targetUser)) {
       loginUser.followings.push(targetUser._id);
       targetUser.followers.push(loginUser._id);
 
@@ -73,7 +74,7 @@ export default class UserProfileController extends BaseController {
       throw errors.USER_NOTFOUND;
     }
 
-    if (loginUser.canUnFollow(targetUser)) {
+    if (loginUser.isFollowing(targetUser)) {
       loginUser.followings = loginUser.followings.filter(
         (followingId) => followingId.toString() !== targetUser._id.toString(),
       );

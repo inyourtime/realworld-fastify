@@ -1,4 +1,4 @@
-import { ModelOptions, getModelForClass, prop } from '@typegoose/typegoose';
+import { ModelOptions, prop } from '@typegoose/typegoose';
 import type { DocumentType, Ref } from '@typegoose/typegoose';
 
 import { TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
@@ -7,7 +7,6 @@ import {
   IUserResp,
 } from '../declarations/interfaces/user.interface';
 import { generateAccessToken } from '../utils/token';
-import { Types } from 'mongoose';
 import { Article } from './article.entity';
 
 @ModelOptions({
@@ -37,12 +36,8 @@ export class User extends TimeStamps {
   @prop({ ref: () => User })
   public followings!: Ref<User>[];
 
-  @prop({
-    ref: 'Article',
-    localField: '_id',
-    foreignField: 'favouritedUsers',
-  })
-  favouritedArticles?: Ref<Article>[];
+  @prop({ ref: () => Article })
+  public favouritedArticles!: Ref<Article>[];
 
   public toUserJSON(this: DocumentType<User>): IUserResp {
     return {
@@ -67,32 +62,23 @@ export class User extends TimeStamps {
       username: this.username,
       bio: this.bio,
       image: this.image,
-      following: user ? user.isFollowing(this._id) : false,
+      following: user ? user.isFollowing(this) : false,
     };
   }
 
-  public isFollowing<T extends Types.ObjectId>(
-    this: DocumentType<User>,
-    id: T,
-  ): boolean {
-    return this.followings.includes(id);
-  }
-
-  public canFollow(
+  public isFollowing(
     this: DocumentType<User>,
     user: DocumentType<User>,
   ): boolean {
-    return !this.followings.includes(user._id) && this.email !== user.email;
+    return this._id.toString() === user._id.toString()
+      ? false
+      : this.followings.includes(user._id);
   }
 
-  public canUnFollow(
+  public isFavourited(
     this: DocumentType<User>,
-    user: DocumentType<User>,
-  ): boolean {
-    return this.followings.includes(user._id) && this.email !== user.email;
+    article: DocumentType<Article>,
+  ) {
+    return this.favouritedArticles.includes(article._id);
   }
 }
-
-const UserModel = getModelForClass(User);
-
-export default UserModel;

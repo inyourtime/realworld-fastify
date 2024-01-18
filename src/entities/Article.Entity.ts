@@ -1,19 +1,13 @@
-import {
-  ModelOptions,
-  getModelForClass,
-  isDocument,
-  pre,
-  prop,
-} from '@typegoose/typegoose';
+import { ModelOptions, isDocument, pre, prop } from '@typegoose/typegoose';
 import type { DocumentType, Ref } from '@typegoose/typegoose';
 import { TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
-import UserModel, { User } from './user.entity';
+import { User } from './user.entity';
 import { Comment } from './comment.entity';
 import slugify from 'slugify';
 import { IArticleResp } from '../declarations/interfaces/article.interface';
 import errors from '../constants/errors';
 import { IUserProfileResp } from '../declarations/interfaces/user.interface';
-import { Types } from 'mongoose';
+import { UserModel } from '.';
 
 @ModelOptions({
   schemaOptions: {
@@ -46,7 +40,7 @@ export class Article extends TimeStamps {
   public author!: Ref<User>;
 
   @prop({ ref: () => Comment })
-  public comments?: Ref<Comment>[];
+  public comments!: Ref<Comment>[];
 
   public async toArticleJSON(
     this: DocumentType<Article>,
@@ -60,7 +54,7 @@ export class Article extends TimeStamps {
       tagList: this.tagList,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
-      favorited: user ? this.isFavourite(user._id) : false,
+      favorited: user ? user.isFavourited(this) : false,
       favoritesCount: this.favouritedUsers.length,
       author: await this.getAuthorObject(user),
     };
@@ -79,15 +73,4 @@ export class Article extends TimeStamps {
             return author.toProfileJSON(user);
           });
   }
-
-  public isFavourite<T extends Types.ObjectId>(
-    this: DocumentType<Article>,
-    id: T,
-  ): boolean {
-    return this.favouritedUsers.includes(id);
-  }
 }
-
-const ArticleModel = getModelForClass(Article);
-
-export default ArticleModel;

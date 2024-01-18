@@ -1,8 +1,9 @@
 import errors from '../constants/errors';
 import { IArticleResp } from '../declarations/interfaces/article.interface';
 import { IAnyObject } from '../declarations/interfaces/base.interface';
-import ArticleModel from '../entities/article.entity';
-import UserModel from '../entities/user.entity';
+import { ArticleModel, UserModel } from '../entities';
+import { runTransaction } from '../internal/mongo/connection';
+
 import {
   TArticleCreateSchema,
   TArticlesListQuery,
@@ -63,7 +64,55 @@ export default class ArticleController extends BaseController {
 
   public async deleteArticle() {}
 
-  public async favoriteArticle() {}
+  public async favoriteArticle(
+    slug: string,
+  ): Promise<{ article: IArticleResp }> {
+    const loginUser = await UserModel.findById(this.getUserId()).exec();
+    if (!loginUser) throw errors.USER_NOTFOUND;
 
-  public async unFavoriteArticle() {}
+    const article = await ArticleModel.findOne({ slug }).exec();
+    if (!article) throw errors.ARTICLE_NOTFOUND;
+
+    if (!loginUser.isFavourited(article)) {
+      article.favouritedUsers.push(loginUser._id);
+      loginUser.favouritedArticles.push(article._id);
+
+      await runTransaction(async (session) => {
+        await article.save({ session });
+        await loginUser.save({ session });
+      });
+    }
+
+    return {
+      article: await article.toArticleJSON(loginUser),
+    };
+  }
+
+  public async unFavoriteArticle(
+    slug: string,
+  ): Promise<{ article: IArticleResp }> {
+    const loginUser = await UserModel.findById(this.getUserId()).exec();
+    if (!loginUser) throw errors.USER_NOTFOUND;
+
+    const article = await ArticleModel.findOne({ slug }).exec();
+    if (!article) throw errors.ARTICLE_NOTFOUND;
+
+    if (loginUser.isFavourited(article)) {
+      article.favouritedUsers = article.favouritedUsers.filter(
+        (userId) => userId.toString() !== loginUser._id.toString(),
+      );
+      loginUser.favouritedArticles = loginUser.favouritedArticles.filter(
+        (articleId) => articleId.toString() !== article._id.toString(),
+      );
+
+      await runTransaction(async (session) => {
+        await article.save({ session });
+        await loginUser.save({ session });
+      });
+    }
+
+    return {
+      article: await article.toArticleJSON(loginUser),
+    };
+  }
 }

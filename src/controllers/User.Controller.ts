@@ -1,4 +1,3 @@
-import UserModel from '../entities/user.entity';
 import {
   TUserCreateSchema,
   TUserLoginSchema,
@@ -9,6 +8,7 @@ import { IUserResp } from '../declarations/interfaces/user.interface';
 import BaseController from './base.controller';
 import { IAnyObject } from '../declarations/interfaces/base.interface';
 import errors from '../constants/errors';
+import { UserModel } from '../entities';
 
 export default class UserController extends BaseController {
   constructor(auth?: IAnyObject) {

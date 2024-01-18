@@ -100,6 +100,7 @@ export default class ArticleController extends BaseController {
     const filteredArticles = await ArticleModel.find(query)
       .limit(limit)
       .skip(offset)
+      .sort({ createdAt: 'desc' })
       .populate('author')
       .exec();
 

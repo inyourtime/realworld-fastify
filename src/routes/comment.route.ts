@@ -4,6 +4,11 @@ import {
   FastifyReply,
   FastifyRequest,
 } from 'fastify';
+import CommentController from '../controllers/comment.controller';
+import {
+  TCommentCreateSchema,
+  commentCreateSchema,
+} from '../schemas/comment.schema';
 
 export default async (
   server: FastifyInstance,
@@ -17,10 +22,20 @@ export default async (
     config: {
       auth: true,
     },
+    schema: {
+      body: commentCreateSchema,
+    },
     handler: async (
-      request: FastifyRequest<{ Params: { slug: string } }>,
+      request: FastifyRequest<{
+        Params: { slug: string };
+        Body: TCommentCreateSchema;
+      }>,
       reply: FastifyReply,
-    ) => {},
+    ) =>
+      new CommentController(request.auth).addCommentsToArticle(
+        request.params.slug,
+        request.body,
+      ),
   });
 
   server.route({
@@ -32,7 +47,10 @@ export default async (
     handler: async (
       request: FastifyRequest<{ Params: { slug: string } }>,
       reply: FastifyReply,
-    ) => {},
+    ) =>
+      new CommentController(request.auth).getCommentsFromArticle(
+        request.params.slug,
+      ),
   });
 
   server.route({
@@ -44,6 +62,10 @@ export default async (
     handler: async (
       request: FastifyRequest<{ Params: { slug: string; id: string } }>,
       reply: FastifyReply,
-    ) => {},
+    ) =>
+      new CommentController(request.auth).deleteComment(
+        request.params.slug,
+        request.params.id,
+      ),
   });
 };

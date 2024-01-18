@@ -9,4 +9,5 @@ export default {
   LOGIN_ERROR: ApiError.createError(`Email or password are incorrect`, STATUS_CODE.UNAUTHORIZED),
   ARTICLE_EXIST: ApiError.createError(`Article slug are already exist`, STATUS_CODE.UNPROCESSABLE_CONTENT),
   ARTICLE_NOTFOUND: ApiError.createError(`Article Not Found`, STATUS_CODE.NOT_FOUND),
+  COMMENT_NOTFOUND: ApiError.createError(`Comment Not Found`, STATUS_CODE.NOT_FOUND)
 };

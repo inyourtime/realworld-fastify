@@ -77,10 +77,7 @@ export class Article extends TimeStamps {
           });
   }
 
-  public async addComment(
-    this: DocumentType<Article>,
-    comment: DocumentType<Comment>,
-  ) {
+  public async addComment(this: DocumentType<Article>, comment: DocumentType<Comment>) {
     this.comments.push(comment);
 
     await runTransaction(async (session) => {
@@ -89,10 +86,7 @@ export class Article extends TimeStamps {
     });
   }
 
-  public async deleteComment(
-    this: DocumentType<Article>,
-    comment: DocumentType<Comment>,
-  ) {
+  public async deleteComment(this: DocumentType<Article>, comment: DocumentType<Comment>) {
     this.comments = filterOutRef(this.comments, comment);
 
     await runTransaction(async (session) => {

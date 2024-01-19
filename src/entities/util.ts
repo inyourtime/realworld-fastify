@@ -12,12 +12,7 @@ import { Types } from 'mongoose';
 //   );
 // }
 
-export function filterOutRef<T extends Base>(
-  array: Ref<T>[],
-  ref: T | Types.ObjectId,
-): Ref<T>[] {
+export function filterOutRef<T extends Base>(array: Ref<T>[], ref: T | Types.ObjectId): Ref<T>[] {
   const out = ref instanceof Types.ObjectId ? ref : ref._id;
-  return array.filter((item) =>
-    isDocument(item) ? !item._id.equals(out) : !item.equals(out),
-  );
+  return array.filter((item) => (isDocument(item) ? !item._id.equals(out) : !item.equals(out)));
 }

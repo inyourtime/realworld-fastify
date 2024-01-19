@@ -1,15 +1,7 @@
-import {
-  FastifyInstance,
-  FastifyPluginOptions,
-  FastifyReply,
-  FastifyRequest,
-} from 'fastify';
+import { FastifyInstance, FastifyPluginOptions, FastifyReply, FastifyRequest } from 'fastify';
 import TagContrtoller from '../controllers/tag.controller';
 
-export default async (
-  server: FastifyInstance,
-  option: FastifyPluginOptions,
-) => {
+export default async (server: FastifyInstance, option: FastifyPluginOptions) => {
   const apiModule = '/tags';
 
   server.route({

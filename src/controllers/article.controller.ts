@@ -1,8 +1,5 @@
 import errors from '../constants/errors';
-import {
-  IArticleQuery,
-  IArticleResp,
-} from '../declarations/interfaces/article.interface';
+import { IArticleQuery, IArticleResp } from '../declarations/interfaces/article.interface';
 import { IAnyObject } from '../declarations/interfaces/base.interface';
 import { ArticleModel, UserModel } from '../entities';
 import ApiError from '../internal/fastify/responseHandler/apiError';
@@ -68,9 +65,7 @@ export default class ArticleController extends BaseController {
             if (!loginUser) throw errors.USER_NOTFOUND;
             return {
               articles: await Promise.all(
-                filteredArticles.map(async (article) =>
-                  article.toArticleJSON(loginUser),
-                ),
+                filteredArticles.map(async (article) => article.toArticleJSON(loginUser)),
               ),
               articlesCount,
             };
@@ -107,9 +102,7 @@ export default class ArticleController extends BaseController {
 
     return {
       articles: await Promise.all(
-        filteredArticles.map(async (article) =>
-          article.toArticleJSON(loginUser),
-        ),
+        filteredArticles.map(async (article) => article.toArticleJSON(loginUser)),
       ),
       articlesCount,
     };
@@ -207,9 +200,7 @@ export default class ArticleController extends BaseController {
     };
   }
 
-  public async favoriteArticle(
-    slug: string,
-  ): Promise<{ article: IArticleResp }> {
+  public async favoriteArticle(slug: string): Promise<{ article: IArticleResp }> {
     const loginUser = await UserModel.findById(this.getUserId()).exec();
     if (!loginUser) throw errors.USER_NOTFOUND;
 
@@ -223,9 +214,7 @@ export default class ArticleController extends BaseController {
     };
   }
 
-  public async unFavoriteArticle(
-    slug: string,
-  ): Promise<{ article: IArticleResp }> {
+  public async unFavoriteArticle(slug: string): Promise<{ article: IArticleResp }> {
     const loginUser = await UserModel.findById(this.getUserId()).exec();
     if (!loginUser) throw errors.USER_NOTFOUND;
 

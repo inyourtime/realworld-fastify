@@ -1,8 +1,4 @@
-import Fastify, {
-  FastifyInstance,
-  FastifyPluginCallback,
-  FastifyPluginOptions,
-} from 'fastify';
+import Fastify, { FastifyInstance, FastifyPluginCallback, FastifyPluginOptions } from 'fastify';
 import { IRouterConfig } from './server.interface';
 import path from 'path';
 import { glob } from 'glob';
@@ -34,10 +30,7 @@ export default class FastifyServer {
 
     const target = Object.assign({}, defaultArgs, config);
 
-    const routeFolder = path.resolve(
-      __dirname,
-      target.routerFolder.replace(/\\/g, '/'),
-    );
+    const routeFolder = path.resolve(__dirname, target.routerFolder.replace(/\\/g, '/'));
     const preRoutePaths = glob.sync(routeFolder);
     const routePaths = preRoutePaths.flat(Infinity);
 

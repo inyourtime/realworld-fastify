@@ -1,9 +1,4 @@
-import {
-  FastifyInstance,
-  FastifyPluginOptions,
-  FastifyReply,
-  FastifyRequest,
-} from 'fastify';
+import { FastifyInstance, FastifyPluginOptions, FastifyReply, FastifyRequest } from 'fastify';
 import ArticleController from '../controllers/article.controller';
 import {
   TArticleCreateSchema,
@@ -16,10 +11,7 @@ import {
   baseArticleQuery,
 } from '../schemas/article.schema';
 
-export default async (
-  server: FastifyInstance,
-  option: FastifyPluginOptions,
-) => {
+export default async (server: FastifyInstance, option: FastifyPluginOptions) => {
   const apiModule = '/articles';
 
   server.route({
@@ -58,10 +50,8 @@ export default async (
     config: {
       auth: false,
     },
-    handler: async (
-      request: FastifyRequest<{ Params: { slug: string } }>,
-      reply: FastifyReply,
-    ) => new ArticleController(request.auth).getArticle(request.params.slug),
+    handler: async (request: FastifyRequest<{ Params: { slug: string } }>, reply: FastifyReply) =>
+      new ArticleController(request.auth).getArticle(request.params.slug),
   });
 
   server.route({
@@ -73,10 +63,8 @@ export default async (
     schema: {
       body: articleCreateSchema,
     },
-    handler: async (
-      request: FastifyRequest<{ Body: TArticleCreateSchema }>,
-      reply: FastifyReply,
-    ) => new ArticleController(request.auth).createArticle(request.body),
+    handler: async (request: FastifyRequest<{ Body: TArticleCreateSchema }>, reply: FastifyReply) =>
+      new ArticleController(request.auth).createArticle(request.body),
   });
 
   server.route({
@@ -94,11 +82,7 @@ export default async (
         Body: TArticleUpdateSchema;
       }>,
       reply: FastifyReply,
-    ) =>
-      new ArticleController(request.auth).updateArticle(
-        request.params.slug,
-        request.body,
-      ),
+    ) => new ArticleController(request.auth).updateArticle(request.params.slug, request.body),
   });
 
   server.route({
@@ -107,10 +91,8 @@ export default async (
     config: {
       auth: true,
     },
-    handler: async (
-      request: FastifyRequest<{ Params: { slug: string } }>,
-      reply: FastifyReply,
-    ) => new ArticleController(request.auth).deleteArticle(request.params.slug),
+    handler: async (request: FastifyRequest<{ Params: { slug: string } }>, reply: FastifyReply) =>
+      new ArticleController(request.auth).deleteArticle(request.params.slug),
   });
 
   server.route({
@@ -119,10 +101,7 @@ export default async (
     config: {
       auth: true,
     },
-    handler: async (
-      request: FastifyRequest<{ Params: { slug: string } }>,
-      reply: FastifyReply,
-    ) =>
+    handler: async (request: FastifyRequest<{ Params: { slug: string } }>, reply: FastifyReply) =>
       new ArticleController(request.auth).favoriteArticle(request.params.slug),
   });
 
@@ -132,12 +111,7 @@ export default async (
     config: {
       auth: true,
     },
-    handler: async (
-      request: FastifyRequest<{ Params: { slug: string } }>,
-      reply: FastifyReply,
-    ) =>
-      new ArticleController(request.auth).unFavoriteArticle(
-        request.params.slug,
-      ),
+    handler: async (request: FastifyRequest<{ Params: { slug: string } }>, reply: FastifyReply) =>
+      new ArticleController(request.auth).unFavoriteArticle(request.params.slug),
   });
 };

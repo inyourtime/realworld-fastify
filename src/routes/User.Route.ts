@@ -1,9 +1,4 @@
-import {
-  FastifyInstance,
-  FastifyRequest,
-  FastifyReply,
-  FastifyPluginOptions,
-} from 'fastify';
+import { FastifyInstance, FastifyRequest, FastifyReply, FastifyPluginOptions } from 'fastify';
 import {
   TUserCreateSchema,
   TUserLoginSchema,
@@ -14,10 +9,7 @@ import {
 } from '../schemas/user.schema';
 import UserController from '../controllers/user.controller';
 
-export default async (
-  server: FastifyInstance,
-  option: FastifyPluginOptions,
-) => {
+export default async (server: FastifyInstance, option: FastifyPluginOptions) => {
   const apiModuleUsers = '/users';
   const apiModuleUser = '/user';
 
@@ -30,10 +22,8 @@ export default async (
     schema: {
       body: userLoginSchema,
     },
-    handler: async (
-      request: FastifyRequest<{ Body: TUserLoginSchema }>,
-      reply: FastifyReply,
-    ) => new UserController(request.auth).login(request.body),
+    handler: async (request: FastifyRequest<{ Body: TUserLoginSchema }>, reply: FastifyReply) =>
+      new UserController(request.auth).login(request.body),
   });
 
   server.route({
@@ -45,10 +35,8 @@ export default async (
     schema: {
       body: userCreateSchema,
     },
-    handler: async (
-      request: FastifyRequest<{ Body: TUserCreateSchema }>,
-      reply: FastifyReply,
-    ) => new UserController(request.auth).register(request.body),
+    handler: async (request: FastifyRequest<{ Body: TUserCreateSchema }>, reply: FastifyReply) =>
+      new UserController(request.auth).register(request.body),
   });
 
   server.route({
@@ -70,9 +58,7 @@ export default async (
     schema: {
       body: userUpdateSchema,
     },
-    handler: async (
-      request: FastifyRequest<{ Body: TUserUpdateSchema }>,
-      reply: FastifyReply,
-    ) => new UserController(request.auth).updateUser(request.body),
+    handler: async (request: FastifyRequest<{ Body: TUserUpdateSchema }>, reply: FastifyReply) =>
+      new UserController(request.auth).updateUser(request.body),
   });
 };

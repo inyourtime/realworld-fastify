@@ -14,9 +14,7 @@ export const ConnectMongo = async (): Promise<void> =>
 
 type TransactionCallback<T> = (session: ClientSession) => Promise<T>;
 
-export async function runTransaction<T>(
-  transactionCallback: TransactionCallback<T>,
-): Promise<T> {
+export async function runTransaction<T>(transactionCallback: TransactionCallback<T>): Promise<T> {
   const session = await mongoose.startSession();
 
   try {

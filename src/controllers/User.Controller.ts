@@ -1,8 +1,4 @@
-import {
-  TUserCreateSchema,
-  TUserLoginSchema,
-  TUserUpdateSchema,
-} from '../schemas/user.schema';
+import { TUserCreateSchema, TUserLoginSchema, TUserUpdateSchema } from '../schemas/user.schema';
 import { checkPassword, hashPassword } from '../utils/bcrypt';
 import { IUserResp } from '../declarations/interfaces/user.interface';
 import BaseController from './base.controller';
@@ -40,10 +36,7 @@ export default class UserController extends BaseController {
     }
   }
 
-  public async login({
-    email,
-    password,
-  }: TUserLoginSchema): Promise<{ user: IUserResp }> {
+  public async login({ email, password }: TUserLoginSchema): Promise<{ user: IUserResp }> {
     const user = await UserModel.findOne(
       { email },
       { email: 1, username: 1, bio: 1, image: 1, password: 1 },
@@ -77,9 +70,7 @@ export default class UserController extends BaseController {
     };
   }
 
-  public async updateUser({
-    user,
-  }: TUserUpdateSchema): Promise<{ user: IUserResp }> {
+  public async updateUser({ user }: TUserUpdateSchema): Promise<{ user: IUserResp }> {
     const { email, username, password, image, bio } = user;
 
     const target = await UserModel.findOne({

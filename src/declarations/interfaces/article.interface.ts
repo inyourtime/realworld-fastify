@@ -6,13 +6,7 @@ import { Ref } from '@typegoose/typegoose';
 
 export type TArticleResp = Pick<
   Article,
-  | 'slug'
-  | 'title'
-  | 'description'
-  | 'body'
-  | 'tagList'
-  | 'createdAt'
-  | 'updatedAt'
+  'slug' | 'title' | 'description' | 'body' | 'tagList' | 'createdAt' | 'updatedAt'
 >;
 
 // export type TAuthorResp = Pick<User, 'username' | 'bio' | 'image'>;

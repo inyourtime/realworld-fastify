@@ -1,9 +1,5 @@
 import Fastify from 'fastify';
-import plugin, {
-  ERR_MISSING_AUTHEN,
-  ERR_TOKEN_EXPIRED,
-  ERR_TOKEN_INVALID,
-} from '../authenticate';
+import plugin, { ERR_MISSING_AUTHEN, ERR_TOKEN_EXPIRED, ERR_TOKEN_INVALID } from '../authenticate';
 import { verifyToken } from '../../utils/token';
 import { STATUS_CODE } from '../../internal/fastify/responseHandler/statusCode';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
@@ -77,9 +73,7 @@ describe('Test authentication plugin', () => {
 
   describe('error case', () => {
     it('should invalid token', async () => {
-      (
-        verifyToken as jest.Mock<ReturnType<typeof verifyToken>>
-      ).mockReturnValueOnce({
+      (verifyToken as jest.Mock<ReturnType<typeof verifyToken>>).mockReturnValueOnce({
         error: new JsonWebTokenError('invalid'),
         result: undefined,
       });
@@ -106,9 +100,7 @@ describe('Test authentication plugin', () => {
     });
 
     it('should expired token', async () => {
-      (
-        verifyToken as jest.Mock<ReturnType<typeof verifyToken>>
-      ).mockReturnValueOnce({
+      (verifyToken as jest.Mock<ReturnType<typeof verifyToken>>).mockReturnValueOnce({
         error: new TokenExpiredError('expired', new Date()),
         result: undefined,
       });

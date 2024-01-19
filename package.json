@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --config=jest.config.ts --detectOpenHandles",
-    "test:coverage": "jest --config=jest.config.ts --detectOpenHandles --coverage",
+    "test": "jest --detectOpenHandles",
+    "test:watch": "jest --watch --detectOpenHandles",
+    "test:coverage": "jest --detectOpenHandles --coverage",
+    "test:seq": "jest --detectOpenHandles --coverage --runInBand",
     "dev": "nodemon src/index.ts",
     "build": "tsc -p tsconfig.prod.json",
     "start": "node dist/index.js",

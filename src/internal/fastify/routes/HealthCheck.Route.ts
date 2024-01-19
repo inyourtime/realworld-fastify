@@ -1,15 +1,7 @@
-import {
-  FastifyInstance,
-  FastifyPluginOptions,
-  FastifyReply,
-  FastifyRequest,
-} from 'fastify';
+import { FastifyInstance, FastifyPluginOptions, FastifyReply, FastifyRequest } from 'fastify';
 import mongoose, { STATES } from 'mongoose';
 
-export default async (
-  server: FastifyInstance,
-  option: FastifyPluginOptions,
-) => {
+export default async (server: FastifyInstance, option: FastifyPluginOptions) => {
   server.route({
     method: 'GET',
     url: '/hc',

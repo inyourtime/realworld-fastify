@@ -1,9 +1,5 @@
 import { STATES } from 'mongoose';
-import {
-  cleanData,
-  connect,
-  disconnect,
-} from '../../__helper__/mongo.memory.test.helper';
+import { cleanData, connect, disconnect } from '../../__helper__/mongo.memory.test.helper';
 import FastifyServer from '../../internal/fastify';
 
 describe('test', () => {

@@ -1,15 +1,7 @@
-import {
-  FastifyInstance,
-  FastifyPluginOptions,
-  FastifyReply,
-  FastifyRequest,
-} from 'fastify';
+import { FastifyInstance, FastifyPluginOptions, FastifyReply, FastifyRequest } from 'fastify';
 import UserProfileController from '../controllers/userProfile.controller';
 
-export default async (
-  server: FastifyInstance,
-  option: FastifyPluginOptions,
-) => {
+export default async (server: FastifyInstance, option: FastifyPluginOptions) => {
   const apiModule = '/profiles';
 
   server.route({
@@ -21,10 +13,7 @@ export default async (
     handler: async (
       request: FastifyRequest<{ Params: { username: string } }>,
       reply: FastifyReply,
-    ) =>
-      new UserProfileController(request.auth).getProfile(
-        request.params.username,
-      ),
+    ) => new UserProfileController(request.auth).getProfile(request.params.username),
   });
 
   server.route({
@@ -36,10 +25,7 @@ export default async (
     handler: async (
       request: FastifyRequest<{ Params: { username: string } }>,
       reply: FastifyReply,
-    ) =>
-      new UserProfileController(request.auth).followUser(
-        request.params.username,
-      ),
+    ) => new UserProfileController(request.auth).followUser(request.params.username),
   });
 
   server.route({
@@ -51,9 +37,6 @@ export default async (
     handler: async (
       request: FastifyRequest<{ Params: { username: string } }>,
       reply: FastifyReply,
-    ) =>
-      new UserProfileController(request.auth).unFollowUser(
-        request.params.username,
-      ),
+    ) => new UserProfileController(request.auth).unFollowUser(request.params.username),
   });
 };

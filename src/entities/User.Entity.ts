@@ -2,10 +2,7 @@ import { ModelOptions, prop } from '@typegoose/typegoose';
 import type { DocumentType, Ref } from '@typegoose/typegoose';
 
 import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
-import {
-  IUserProfileResp,
-  IUserResp,
-} from '../declarations/interfaces/user.interface';
+import { IUserProfileResp, IUserResp } from '../declarations/interfaces/user.interface';
 import { generateAccessToken } from '../utils/token';
 import { Article } from './article.entity';
 import { runTransaction } from '../internal/mongo/connection';
@@ -57,10 +54,7 @@ export class User extends TimeStamps {
     };
   }
 
-  public toProfileJSON(
-    this: DocumentType<User>,
-    user?: DocumentType<User>,
-  ): IUserProfileResp {
+  public toProfileJSON(this: DocumentType<User>, user?: DocumentType<User>): IUserProfileResp {
     return {
       username: this.username,
       bio: this.bio,
@@ -69,26 +63,15 @@ export class User extends TimeStamps {
     };
   }
 
-  public isFollowing(
-    this: DocumentType<User>,
-    user: DocumentType<User>,
-  ): boolean {
-    return this._id.toString() === user._id.toString()
-      ? false
-      : this.followings.includes(user._id);
+  public isFollowing(this: DocumentType<User>, user: DocumentType<User>): boolean {
+    return this._id.toString() === user._id.toString() ? false : this.followings.includes(user._id);
   }
 
-  public isFavourited(
-    this: DocumentType<User>,
-    article: DocumentType<Article>,
-  ) {
+  public isFavourited(this: DocumentType<User>, article: DocumentType<Article>) {
     return this.favouritedArticles.includes(article._id);
   }
 
-  public async follow(
-    this: DocumentType<User>,
-    user: DocumentType<User> /* target user */,
-  ) {
+  public async follow(this: DocumentType<User>, user: DocumentType<User> /* target user */) {
     if (!this.isFollowing(user) && !this._id.equals(user._id)) {
       this.followings.push(user._id);
       user.followers.push(this._id);
@@ -100,10 +83,7 @@ export class User extends TimeStamps {
     }
   }
 
-  public async unFollow(
-    this: DocumentType<User>,
-    user: DocumentType<User> /* target user */,
-  ) {
+  public async unFollow(this: DocumentType<User>, user: DocumentType<User> /* target user */) {
     if (this.isFollowing(user)) {
       this.followings = filterOutRef(this.followings, user);
       user.followers = filterOutRef(user.followers, this);
@@ -115,10 +95,7 @@ export class User extends TimeStamps {
     }
   }
 
-  public async favorite(
-    this: DocumentType<User>,
-    article: DocumentType<Article>,
-  ) {
+  public async favorite(this: DocumentType<User>, article: DocumentType<Article>) {
     if (!this.isFavourited(article)) {
       article.favouritedUsers.push(this._id);
       this.favouritedArticles.push(article._id);
@@ -130,10 +107,7 @@ export class User extends TimeStamps {
     }
   }
 
-  public async unFavorite(
-    this: DocumentType<User>,
-    article: DocumentType<Article>,
-  ) {
+  public async unFavorite(this: DocumentType<User>, article: DocumentType<Article>) {
     if (this.isFavourited(article)) {
       article.favouritedUsers = filterOutRef(article.favouritedUsers, this);
       this.favouritedArticles = filterOutRef(this.favouritedArticles, article);

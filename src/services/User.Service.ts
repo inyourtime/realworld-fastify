@@ -1,6 +1,7 @@
 import { ReturnModelType } from '@typegoose/typegoose';
 import { BeAnObject } from '@typegoose/typegoose/lib/types';
-import UserModel, { User } from '../entities/user.entity';
+import { UserModel } from '../entities';
+import { User } from '../entities/user.entity';
 
 export default class UserService {
   private _model: ReturnModelType<typeof User, BeAnObject>;

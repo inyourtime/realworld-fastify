@@ -1,19 +1,8 @@
-import {
-  FastifyInstance,
-  FastifyPluginOptions,
-  FastifyReply,
-  FastifyRequest,
-} from 'fastify';
+import { FastifyInstance, FastifyPluginOptions, FastifyReply, FastifyRequest } from 'fastify';
 import CommentController from '../controllers/comment.controller';
-import {
-  TCommentCreateSchema,
-  commentCreateSchema,
-} from '../schemas/comment.schema';
+import { TCommentCreateSchema, commentCreateSchema } from '../schemas/comment.schema';
 
-export default async (
-  server: FastifyInstance,
-  option: FastifyPluginOptions,
-) => {
+export default async (server: FastifyInstance, option: FastifyPluginOptions) => {
   const apiModule = '/articles';
 
   server.route({
@@ -32,10 +21,7 @@ export default async (
       }>,
       reply: FastifyReply,
     ) =>
-      new CommentController(request.auth).addCommentsToArticle(
-        request.params.slug,
-        request.body,
-      ),
+      new CommentController(request.auth).addCommentsToArticle(request.params.slug, request.body),
   });
 
   server.route({
@@ -44,13 +30,8 @@ export default async (
     config: {
       auth: 'OPTIONAL',
     },
-    handler: async (
-      request: FastifyRequest<{ Params: { slug: string } }>,
-      reply: FastifyReply,
-    ) =>
-      new CommentController(request.auth).getCommentsFromArticle(
-        request.params.slug,
-      ),
+    handler: async (request: FastifyRequest<{ Params: { slug: string } }>, reply: FastifyReply) =>
+      new CommentController(request.auth).getCommentsFromArticle(request.params.slug),
   });
 
   server.route({
@@ -62,10 +43,6 @@ export default async (
     handler: async (
       request: FastifyRequest<{ Params: { slug: string; id: string } }>,
       reply: FastifyReply,
-    ) =>
-      new CommentController(request.auth).deleteComment(
-        request.params.slug,
-        request.params.id,
-      ),
+    ) => new CommentController(request.auth).deleteComment(request.params.slug, request.params.id),
   });
 };

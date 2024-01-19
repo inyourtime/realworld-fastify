@@ -32,9 +32,7 @@ export default class CommentController extends BaseController {
     };
   }
 
-  public async getCommentsFromArticle(
-    slug: string,
-  ): Promise<{ comments: ICommentResp[] }> {
+  public async getCommentsFromArticle(slug: string): Promise<{ comments: ICommentResp[] }> {
     const article = await ArticleModel.findOne({ slug })
       .populate({
         path: 'comments',
@@ -51,9 +49,7 @@ export default class CommentController extends BaseController {
             return {
               comments: await Promise.all(
                 article.comments.map(async (comment) =>
-                  isDocument(comment)
-                    ? comment.toCommentJSON(loginUser)
-                    : ({} as ICommentResp),
+                  isDocument(comment) ? comment.toCommentJSON(loginUser) : ({} as ICommentResp),
                 ),
               ),
             };
@@ -61,9 +57,7 @@ export default class CommentController extends BaseController {
       : {
           comments: await Promise.all(
             article.comments.map(async (comment) =>
-              isDocument(comment)
-                ? comment.toCommentJSON()
-                : ({} as ICommentResp),
+              isDocument(comment) ? comment.toCommentJSON() : ({} as ICommentResp),
             ),
           ),
         };

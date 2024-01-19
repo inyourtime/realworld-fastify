@@ -10,9 +10,7 @@ export default class UserProfileController extends BaseController {
     super(auth);
   }
 
-  public async getProfile(
-    username: string,
-  ): Promise<{ profile: IUserProfileResp }> {
+  public async getProfile(username: string): Promise<{ profile: IUserProfileResp }> {
     const targetProfile = await UserModel.findOne({ username }).exec();
     if (!targetProfile) {
       throw errors.PROFILE_NOTFOUND;
@@ -34,9 +32,7 @@ export default class UserProfileController extends BaseController {
         };
   }
 
-  public async followUser(
-    username: string,
-  ): Promise<{ profile: IUserProfileResp }> {
+  public async followUser(username: string): Promise<{ profile: IUserProfileResp }> {
     const [loginUser, targetUser] = await Promise.all([
       UserModel.findOne({ email: this.getUserEmail() }).exec(),
       UserModel.findOne({ username }).exec(),
@@ -53,9 +49,7 @@ export default class UserProfileController extends BaseController {
     };
   }
 
-  public async unFollowUser(
-    username: string,
-  ): Promise<{ profile: IUserProfileResp }> {
+  public async unFollowUser(username: string): Promise<{ profile: IUserProfileResp }> {
     const [loginUser, targetUser] = await Promise.all([
       UserModel.findOne({ email: this.getUserEmail() }).exec(),
       UserModel.findOne({ username }).exec(),

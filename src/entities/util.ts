@@ -3,14 +3,14 @@ import { Base } from '@typegoose/typegoose/lib/defaultClasses';
 // import { BeAnObject, BeAnyObject } from '@typegoose/typegoose/lib/types';
 import { Types } from 'mongoose';
 
-export function filterOutId<T extends Base>(
-  array: Ref<T>[],
-  id: Types.ObjectId,
-): Ref<T>[] {
-  return array.filter((item) =>
-    isDocument(item) ? !item._id.equals(id) : !item.equals(id),
-  );
-}
+// export function filterOutId<T extends Base>(
+//   array: Ref<T>[],
+//   id: Types.ObjectId,
+// ): Ref<T>[] {
+//   return array.filter((item) =>
+//     isDocument(item) ? !item._id.equals(id) : !item.equals(id),
+//   );
+// }
 
 export function filterOutRef<T extends Base>(
   array: Ref<T>[],

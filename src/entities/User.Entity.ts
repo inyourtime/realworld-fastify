@@ -89,7 +89,7 @@ export class User extends TimeStamps {
     this: DocumentType<User>,
     user: DocumentType<User> /* target user */,
   ) {
-    if (!this.isFollowing(user)) {
+    if (!this.isFollowing(user) && !this._id.equals(user._id)) {
       this.followings.push(user._id);
       user.followers.push(this._id);
 

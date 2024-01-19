@@ -7,7 +7,9 @@ import slugify from 'slugify';
 import { IArticleResp } from '../declarations/interfaces/article.interface';
 import errors from '../constants/errors';
 import { IUserProfileResp } from '../declarations/interfaces/user.interface';
-import { UserModel } from '.';
+import { CommentModel, UserModel } from '.';
+import { runTransaction } from '../internal/mongo/connection';
+import { filterOutRef } from './util';
 
 export interface Article extends Base {}
 @ModelOptions({
@@ -73,5 +75,29 @@ export class Article extends TimeStamps {
             if (!author) throw errors.USER_NOTFOUND;
             return author.toProfileJSON(user);
           });
+  }
+
+  public async addComment(
+    this: DocumentType<Article>,
+    comment: DocumentType<Comment>,
+  ) {
+    this.comments.push(comment);
+
+    await runTransaction(async (session) => {
+      await comment.save({ session });
+      await this.save({ session });
+    });
+  }
+
+  public async deleteComment(
+    this: DocumentType<Article>,
+    comment: DocumentType<Comment>,
+  ) {
+    this.comments = filterOutRef(this.comments, comment);
+
+    await runTransaction(async (session) => {
+      await CommentModel.deleteOne({ _id: comment._id }, { session });
+      await this.save({ session });
+    });
   }
 }

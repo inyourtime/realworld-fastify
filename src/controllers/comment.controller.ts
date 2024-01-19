@@ -3,7 +3,6 @@ import errors from '../constants/errors';
 import { IAnyObject } from '../declarations/interfaces/base.interface';
 import { ICommentResp } from '../declarations/interfaces/comment.interface';
 import { ArticleModel, CommentModel, UserModel } from '../entities';
-import { runTransaction } from '../internal/mongo/connection';
 import { TCommentCreateSchema } from '../schemas/comment.schema';
 import BaseController from './base.controller';
 import ApiError from '../internal/fastify/responseHandler/apiError';
@@ -25,12 +24,8 @@ export default class CommentController extends BaseController {
     if (!article) throw errors.ARTICLE_NOTFOUND;
 
     const newComment = new CommentModel({ ...comment, author });
-    article.comments.push(newComment);
 
-    await runTransaction(async (session) => {
-      await newComment.save({ session });
-      await article.save({ session });
-    });
+    await article.addComment(newComment);
 
     return {
       comment: await newComment.toCommentJSON(author),
@@ -84,18 +79,11 @@ export default class CommentController extends BaseController {
     const comment = await CommentModel.findById(id).exec();
     if (!comment) throw errors.COMMENT_NOTFOUND;
 
-    if (commenter._id.toString() !== comment.author._id.toString()) {
+    if (!commenter._id.equals(comment.author._id)) {
       throw ApiError.createError('You cannot do this', STATUS_CODE.FORBIDDEN);
     }
 
-    article.comments = article.comments.filter(
-      (commentId) => commentId.toString() !== comment._id.toString(),
-    );
-
-    await runTransaction(async (session) => {
-      await CommentModel.deleteOne({ _id: comment._id }, { session });
-      await article.save({ session });
-    });
+    await article.deleteComment(comment);
 
     return {
       message: 'comment has been successfully deleted!!!',

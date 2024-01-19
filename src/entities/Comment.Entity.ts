@@ -1,12 +1,13 @@
 import { ModelOptions, isDocument, prop } from '@typegoose/typegoose';
 import type { DocumentType, Ref } from '@typegoose/typegoose';
-import { TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
+import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
 import { User } from './user.entity';
 import { IUserProfileResp } from '../declarations/interfaces/user.interface';
 import { UserModel } from '.';
 import errors from '../constants/errors';
 import { ICommentResp } from '../declarations/interfaces/comment.interface';
 
+export interface Comment extends Base {}
 @ModelOptions({
   schemaOptions: {
     versionKey: false,

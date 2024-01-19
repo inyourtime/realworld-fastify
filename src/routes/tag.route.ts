@@ -4,6 +4,7 @@ import {
   FastifyReply,
   FastifyRequest,
 } from 'fastify';
+import TagContrtoller from '../controllers/tag.controller';
 
 export default async (
   server: FastifyInstance,
@@ -17,6 +18,7 @@ export default async (
     config: {
       auth: false,
     },
-    handler: async (request: FastifyRequest, reply: FastifyReply) => {},
+    handler: async (request: FastifyRequest, reply: FastifyReply) =>
+      new TagContrtoller(request.auth).getTags(),
   });
 };

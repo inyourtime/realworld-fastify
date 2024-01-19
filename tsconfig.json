@@ -19,5 +19,6 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "lib": ["ESNext"]
-  }
+  },
+  "exclude": ["jest.config.ts"]
 }

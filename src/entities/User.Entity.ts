@@ -1,14 +1,17 @@
 import { ModelOptions, prop } from '@typegoose/typegoose';
 import type { DocumentType, Ref } from '@typegoose/typegoose';
 
-import { TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
+import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
 import {
   IUserProfileResp,
   IUserResp,
 } from '../declarations/interfaces/user.interface';
 import { generateAccessToken } from '../utils/token';
 import { Article } from './article.entity';
+import { runTransaction } from '../internal/mongo/connection';
+import { filterOutRef } from './util';
 
+export interface User extends Base {}
 @ModelOptions({
   schemaOptions: {
     versionKey: false,
@@ -80,5 +83,65 @@ export class User extends TimeStamps {
     article: DocumentType<Article>,
   ) {
     return this.favouritedArticles.includes(article._id);
+  }
+
+  public async follow(
+    this: DocumentType<User>,
+    user: DocumentType<User> /* target user */,
+  ) {
+    if (!this.isFollowing(user)) {
+      this.followings.push(user._id);
+      user.followers.push(this._id);
+
+      await runTransaction(async (session) => {
+        await this.save({ session });
+        await user.save({ session });
+      });
+    }
+  }
+
+  public async unFollow(
+    this: DocumentType<User>,
+    user: DocumentType<User> /* target user */,
+  ) {
+    if (this.isFollowing(user)) {
+      this.followings = filterOutRef(this.followings, user);
+      user.followers = filterOutRef(user.followers, this);
+
+      await runTransaction(async (session) => {
+        await this.save({ session });
+        await user.save({ session });
+      });
+    }
+  }
+
+  public async favorite(
+    this: DocumentType<User>,
+    article: DocumentType<Article>,
+  ) {
+    if (!this.isFavourited(article)) {
+      article.favouritedUsers.push(this._id);
+      this.favouritedArticles.push(article._id);
+
+      await runTransaction(async (session) => {
+        await article.save({ session });
+        await this.save({ session });
+      });
+    }
+  }
+
+  public async unFavorite(
+    this: DocumentType<User>,
+    article: DocumentType<Article>,
+  ) {
+    if (this.isFavourited(article)) {
+      article.favouritedUsers = filterOutRef(article.favouritedUsers, this);
+      this.favouritedArticles = filterOutRef(this.favouritedArticles, article);
+
+      await runTransaction(async (session) => {
+        await article.save({ session });
+        await this.save({ session });
+      });
+    }
   }
 }

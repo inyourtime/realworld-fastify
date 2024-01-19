@@ -1,6 +1,6 @@
 import { ModelOptions, isDocument, pre, prop } from '@typegoose/typegoose';
 import type { DocumentType, Ref } from '@typegoose/typegoose';
-import { TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
+import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
 import { User } from './user.entity';
 import { Comment } from './comment.entity';
 import slugify from 'slugify';
@@ -9,6 +9,7 @@ import errors from '../constants/errors';
 import { IUserProfileResp } from '../declarations/interfaces/user.interface';
 import { UserModel } from '.';
 
+export interface Article extends Base {}
 @ModelOptions({
   schemaOptions: {
     versionKey: false,
@@ -31,7 +32,7 @@ export class Article extends TimeStamps {
   public body!: string;
 
   @prop({ type: () => [String] })
-  public tagList?: string[];
+  public tagList!: string[];
 
   @prop({ ref: () => User })
   public favouritedUsers!: Ref<User>[];

@@ -7,7 +7,6 @@ import { IAnyObject } from '../declarations/interfaces/base.interface';
 import { ArticleModel, UserModel } from '../entities';
 import ApiError from '../internal/fastify/responseHandler/apiError';
 import { STATUS_CODE } from '../internal/fastify/responseHandler/statusCode';
-import { runTransaction } from '../internal/mongo/connection';
 
 import {
   TArticleCreateSchema,
@@ -217,15 +216,7 @@ export default class ArticleController extends BaseController {
     const article = await ArticleModel.findOne({ slug }).exec();
     if (!article) throw errors.ARTICLE_NOTFOUND;
 
-    if (!loginUser.isFavourited(article)) {
-      article.favouritedUsers.push(loginUser._id);
-      loginUser.favouritedArticles.push(article._id);
-
-      await runTransaction(async (session) => {
-        await article.save({ session });
-        await loginUser.save({ session });
-      });
-    }
+    await loginUser.favorite(article);
 
     return {
       article: await article.toArticleJSON(loginUser),
@@ -241,19 +232,7 @@ export default class ArticleController extends BaseController {
     const article = await ArticleModel.findOne({ slug }).exec();
     if (!article) throw errors.ARTICLE_NOTFOUND;
 
-    if (loginUser.isFavourited(article)) {
-      article.favouritedUsers = article.favouritedUsers.filter(
-        (userId) => userId.toString() !== loginUser._id.toString(),
-      );
-      loginUser.favouritedArticles = loginUser.favouritedArticles.filter(
-        (articleId) => articleId.toString() !== article._id.toString(),
-      );
-
-      await runTransaction(async (session) => {
-        await article.save({ session });
-        await loginUser.save({ session });
-      });
-    }
+    await loginUser.unFavorite(article);
 
     return {
       article: await article.toArticleJSON(loginUser),

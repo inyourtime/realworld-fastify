@@ -1,12 +1,9 @@
-import {
-  GetObjectCommand,
-  ListBucketsCommand,
-  ListObjectsV2Command,
-  S3Client,
-  S3ClientConfig,
-} from '@aws-sdk/client-s3';
+import { GetObjectCommand, S3Client, S3ClientConfig } from '@aws-sdk/client-s3';
 import env from '../../utils/env.util';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { Upload } from '@aws-sdk/lib-storage';
+import { MultipartFile } from '@fastify/multipart';
+import { randomUUID } from 'crypto';
 
 const s3Config: S3ClientConfig = {
   region: 'auto',
@@ -17,30 +14,15 @@ const s3Config: S3ClientConfig = {
   },
 };
 
-export default class S3Handler {
-  private _s3: S3Client;
-  private _bucket: string;
+export default class S3Service {
+  private static _s3 = new S3Client(s3Config);
+  private static _bucket = env.S3_BUCKET;
 
-  constructor() {
-    this._s3 = new S3Client(s3Config);
-    this._bucket = env.S3_BUCKET;
-  }
+  private static getFileType = (mime: string) => {
+    return mime.split('/')[1];
+  };
 
-  public async getBucketList() {
-    return this._s3.send(new ListBucketsCommand('')).then((result) => result.Buckets);
-  }
-
-  public async getObjectsList() {
-    return this._s3
-      .send(
-        new ListObjectsV2Command({
-          Bucket: this._bucket,
-        }),
-      )
-      .then((result) => result.Contents);
-  }
-
-  public async getObject(key: string) {
+  public static getObject(key: string) {
     return this._s3.send(
       new GetObjectCommand({
         Bucket: this._bucket,
@@ -49,9 +31,22 @@ export default class S3Handler {
     );
   }
 
-  public async getObjectUrl(key: string) {
+  public static download(key: string, expiresIn: number = 3600) {
     return getSignedUrl(this._s3, new GetObjectCommand({ Bucket: this._bucket, Key: key }), {
-      expiresIn: 3600,
+      expiresIn,
     });
+  }
+
+  public static async uploadFile(file: MultipartFile) {
+    const fileType = this.getFileType(file.mimetype);
+    const fileNameGen = `${randomUUID()}.${fileType}`;
+    return new Upload({
+      client: this._s3,
+      params: {
+        Bucket: this._bucket,
+        Key: fileNameGen,
+        Body: await file.toBuffer(),
+      },
+    }).done();
   }
 }

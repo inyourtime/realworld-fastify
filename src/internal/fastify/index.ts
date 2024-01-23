@@ -1,4 +1,5 @@
 import Fastify, { FastifyInstance, FastifyPluginCallback, FastifyPluginOptions } from 'fastify';
+import fastifyMultipart from '@fastify/multipart';
 import { IRouterConfig } from './server.interface';
 import path from 'path';
 import { glob } from 'glob';
@@ -55,9 +56,10 @@ export default class FastifyServer {
   }
 
   public bootstrap() {
-    this.setValidatorCompiler()
+    this.addPlugin(cors)
+      .addPlugin(fastifyMultipart, { addToBody: true, attachFieldsToBody: true })
+      .setValidatorCompiler()
       .setErrorHandler()
-      .addPlugin(cors)
       .addPlugin(authenticate)
       .addRouter({
         routerFolder: '../fastify/routes/**/*.route.@(js|ts)',

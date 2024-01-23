@@ -2,7 +2,7 @@
   "name": "realworld-fastify",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.ts",
   "scripts": {
     "test": "jest --detectOpenHandles",
     "test:watch": "jest --watch --detectOpenHandles",
@@ -29,8 +29,10 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.495.0",
+    "@aws-sdk/lib-storage": "^3.496.0",
     "@aws-sdk/s3-request-presigner": "^3.495.0",
     "@fastify/cors": "^8.5.0",
+    "@fastify/multipart": "^8.1.0",
     "@typegoose/typegoose": "^12.0.0",
     "@types/bcrypt": "^5.0.2",
     "bcrypt": "^5.1.1",

@@ -8,6 +8,7 @@ import {
   userUpdateSchema,
 } from '../schemas/user.schema';
 import UserController from '../controllers/user.controller';
+import { convertFormdataToObject } from '../internal/fastify/validators';
 
 export default async (server: FastifyInstance, option: FastifyPluginOptions) => {
   const apiModuleUsers = '/users';
@@ -57,6 +58,9 @@ export default async (server: FastifyInstance, option: FastifyPluginOptions) => 
     },
     schema: {
       body: userUpdateSchema,
+    },
+    preHandler: async (request: FastifyRequest<{ Body: TUserUpdateSchema }>) => {
+      request.body = convertFormdataToObject(request.body);
     },
     handler: async (request: FastifyRequest<{ Body: TUserUpdateSchema }>, reply: FastifyReply) =>
       new UserController(request.auth).updateUser(request.body),

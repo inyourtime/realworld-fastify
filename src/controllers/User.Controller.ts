@@ -5,6 +5,7 @@ import BaseController from './base.controller';
 import { IAnyObject } from '../declarations/interfaces/base.interface';
 import errors from '../constants/errors';
 import { UserModel } from '../entities';
+import S3Service from '../internal/s3';
 
 export default class UserController extends BaseController {
   constructor(auth?: IAnyObject) {
@@ -26,7 +27,7 @@ export default class UserController extends BaseController {
       });
 
       return {
-        user: user.toUserJSON(),
+        user: await user.toUserJSON(),
       };
     } catch (e: any) {
       if (e.code === 11000) {
@@ -50,7 +51,7 @@ export default class UserController extends BaseController {
       throw errors.LOGIN_ERROR;
     }
     return {
-      user: user.toUserJSON(),
+      user: await user.toUserJSON(),
     };
   }
 
@@ -64,14 +65,14 @@ export default class UserController extends BaseController {
 
     return {
       user: {
-        ...user.toUserJSON(),
+        ...(await user.toUserJSON()),
         token: undefined,
       },
     };
   }
 
-  public async updateUser({ user }: TUserUpdateSchema): Promise<{ user: IUserResp }> {
-    const { email, username, password, image, bio } = user;
+  public async updateUser({ user, image }: TUserUpdateSchema): Promise<{ user: IUserResp }> {
+    const { email, username, password, bio } = user;
 
     const target = await UserModel.findOne({
       email: this.getUserEmail(),
@@ -89,18 +90,20 @@ export default class UserController extends BaseController {
     if (password) {
       target.password = await hashPassword(password);
     }
-    if (image) {
-      target.image = image;
-    }
     if (bio) {
       target.bio = bio;
+    }
+
+    if (image) {
+      const uploadResult = await S3Service.uploadFile(image);
+      target.image = uploadResult.Key;
     }
 
     try {
       const userUpdated = await target.save();
       return {
         user: {
-          ...userUpdated.toUserJSON(),
+          ...(await userUpdated.toUserJSON()),
           token: undefined,
         },
       };

@@ -7,6 +7,7 @@ import { generateAccessToken } from '../utils/token';
 import { Article } from './article.entity';
 import { runTransaction } from '../internal/mongo/connection';
 import { filterOutRef } from './util';
+import S3Service from '../internal/s3';
 
 export interface User extends Base {}
 @ModelOptions({
@@ -39,7 +40,7 @@ export class User extends TimeStamps {
   @prop({ ref: () => Article })
   public favouritedArticles!: Ref<Article>[];
 
-  public toUserJSON(this: DocumentType<User>): IUserResp {
+  public async toUserJSON(this: DocumentType<User>): Promise<IUserResp> {
     return {
       email: this.email,
       token: generateAccessToken({
@@ -50,7 +51,7 @@ export class User extends TimeStamps {
       }),
       username: this.username,
       bio: this.bio,
-      image: this.image,
+      image: this.image ? await S3Service.download(this.image) : undefined,
     };
   }
 

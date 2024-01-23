@@ -46,6 +46,7 @@ export default class S3Service {
         Bucket: this._bucket,
         Key: fileNameGen,
         Body: await file.toBuffer(),
+        
       },
     }).done();
   }

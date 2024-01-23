@@ -20,5 +20,5 @@
     "skipLibCheck": true,
     "lib": ["ESNext"]
   },
-  "exclude": ["jest.config.ts"]
+  "exclude": ["node_modules", "**/*.spec.ts", "jest.config.ts"]
 }

@@ -1,5 +1,5 @@
-// import { Types } from 'mongoose';
 import { UserModel } from '..';
+import S3Service from '../../internal/s3';
 
 describe('Test user model method', () => {
   it('should return user json', async () => {
@@ -10,6 +10,8 @@ describe('Test user model method', () => {
     user.bio = 'Test bio';
     user.image = 'test.jpg';
 
+    S3Service.download = jest.fn().mockResolvedValue('mock-url');
+
     const result = await user.toUserJSON();
 
     expect(result).toEqual({
@@ -17,9 +19,10 @@ describe('Test user model method', () => {
       token: expect.any(String),
       username: 'testuser',
       bio: 'Test bio',
-      // image: 'test.jpg',
+      image: 'mock-url',
       password: undefined,
     });
+    expect(S3Service.download).toHaveBeenCalledWith('test.jpg');
   });
 
   it('should return a valid profile object with all fields', () => {
